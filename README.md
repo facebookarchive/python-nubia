@@ -30,7 +30,7 @@ If you start a nubia-based program without a command, it automatically starts an
 ![Interactive Demo](docs/interactive.gif?raw=true "Interactive demo")
 
 ### Non-interactive mode
-The CLI mode is works exactly like any traditional unix-based command line utility.
+The CLI mode works exactly like any traditional unix-based command line utility.
 ![Non-interactive Demo](docs/non_interactive.png?raw=true "Non-interactive demo")
 
 ## Examples
