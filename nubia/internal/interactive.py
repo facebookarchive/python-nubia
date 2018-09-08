@@ -28,6 +28,7 @@ from prompt_toolkit.buffer import Buffer
 from termcolor import cprint
 from nubia.internal.ui.lexer import NubiaLexer
 from pygments.token import Token
+from typing import List, Tuple
 
 import getpass
 import os
@@ -113,9 +114,7 @@ class IOLoop(Listener):
         return cli
 
     def get_prompt_tokens(self, cli):
-        tokens = self._plugin.get_prompt_tokens()
-        if tokens is None:
-            tokens = [(Token.Username, getpass.getuser())]
+        tokens: List[Tuple] = self._plugin.get_prompt_tokens()
         if self._tier:
             tokens.extend([(Token.At, "@"), (Token.Tier, self._tier)])
         tokens.extend([(Token.Colon, ""), (Token.Pound, "> ")])

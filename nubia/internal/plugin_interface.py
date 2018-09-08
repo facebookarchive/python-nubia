@@ -8,6 +8,10 @@
 #
 
 import argparse
+import getpass
+
+from typing import List, Tuple
+from pygments.token import Token
 from nubia.internal.constants import DEFAULT_COMMAND_TIMEOUT
 from nubia.internal.ui import statusbar
 from nubia.internal.context import Context
@@ -137,9 +141,9 @@ class PluginInterface(object):
         """
         return CommandBlacklist()
 
-    def get_prompt_tokens(self):
+    def get_prompt_tokens(self) -> List[Tuple]:
         """
         Override this and return your own prompt for interactive mode.
         Expected to return a list of pygments Token tuples
         """
-        return None
+        return [(Token.Username, getpass.getuser())]
