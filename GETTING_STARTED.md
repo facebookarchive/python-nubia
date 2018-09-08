@@ -11,7 +11,7 @@ The building blocks of a simple Nubia-based application are three pieces:
 ### Plugin
 A Nubia plugin is an object that implements `nubia.PluginInterface`.
 It gives you the ability to configure the behaviour of different aspects of your program.
-Take a look into <example/TODO> to see an example of a very simple Nubia plugin.
+Take a look into `example/nubia_plugin.py` to see an example of a very simple Nubia plugin.
 The table below gives a short overiew of `nubia.PluginInterface`' most important methods.
 
 | Method | Responsibility |
@@ -99,7 +99,7 @@ You can use the `@argument` decorator to add more metadata to the generated
 command option if you like. But before we get to that, let's talk about some
 rules first:
 - Function arguments that have default values are _optional_. If the command is
-executed without supplying a value,k you will receive this default value as
+executed without supplying a value, you will receive this default value as
 defined in the function signature.
 - Function arguments that do not have default values are required.
 - All arguments are _options_ by default, this means that you need to pass
