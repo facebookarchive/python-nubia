@@ -136,3 +136,10 @@ class PluginInterface(object):
         Any return other then 0 will block command execution
         """
         return CommandBlacklist()
+
+    def get_prompt_tokens(self):
+        """
+        Override this and return your own prompt for interactive mode.
+        Expected to return a list of pygments Token tuples
+        """
+        return None

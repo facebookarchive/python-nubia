@@ -20,6 +20,7 @@ The table below gives a short overiew of `nubia.PluginInterface`' most important
 | `get_opts_parser` | Provides the top-level argument parser that handles common arguments |
 | `create_context` | Provides a context object |
 | `get_status_bar` | Provides a status bar |
+| `get_prompt_tokens` | Provides prompt tokens for interactive prompt |
 
 ### Context
 A _context_ is an object that extends `nubia.Context` class.

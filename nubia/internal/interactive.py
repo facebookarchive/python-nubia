@@ -113,7 +113,9 @@ class IOLoop(Listener):
         return cli
 
     def get_prompt_tokens(self, cli):
-        tokens = [(Token.Username, getpass.getuser())]
+        tokens = self._plugin.get_prompt_tokens()
+        if tokens is None:
+            tokens = [(Token.Username, getpass.getuser())]
         if self._tier:
             tokens.extend([(Token.At, "@"), (Token.Tier, self._tier)])
         tokens.extend([(Token.Colon, ""), (Token.Pound, "> ")])
