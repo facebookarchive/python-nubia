@@ -37,6 +37,7 @@ The CLI mode works exactly like any traditional unix-based command line utility.
 It starts with a function like this:
 ```py
 import socket
+import typing
 
 from termcolor import cprint
 from nubia import argument, command, context
@@ -50,10 +51,10 @@ def lookup(hosts: typing.List[str], bad_name: int):
     """
     ctx = context.get_context()
     print(f"hosts: {hosts}")
-    cprint(f"Verbose? {}".format(ctx.verbose), "yellow")
+    cprint(f"Verbose? {ctx.verbose}")
 
     for host in hosts:
-        cprint("{} is {}".format(host, socket.gethostbyname(host)))
+        cprint(f"{host} is {socket.gethostbyname(host)}")
 
     # optional, by default it's 0
     return 0
