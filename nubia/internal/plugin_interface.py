@@ -10,7 +10,7 @@
 import argparse
 import getpass
 
-from typing import List, Tuple
+from typing import List, Tuple, Any
 from pygments.token import Token
 from nubia.internal.constants import DEFAULT_COMMAND_TIMEOUT
 from nubia.internal.ui import statusbar
@@ -119,6 +119,9 @@ class PluginInterface(object):
     def get_status_bar(self, context):
         return statusbar.StatusBar(context)
 
+    def get_prompt_tokens(self, context) -> List[Tuple[Any, str]]:
+        return context.get_prompt_tokens()
+
     def setup_logging(self, root_logger, args):
         """
         Override this and configure your own logging setup. Return your root
@@ -140,10 +143,3 @@ class PluginInterface(object):
         Any return other then 0 will block command execution
         """
         return CommandBlacklist()
-
-    def get_prompt_tokens(self) -> List[Tuple]:
-        """
-        Override this and return your own prompt for interactive mode.
-        Expected to return a list of pygments Token tuples
-        """
-        return [(Token.Username, getpass.getuser())]

@@ -10,9 +10,12 @@
 import copy
 import sys
 import os
+import getpass
 
 from nubia.internal.io.eventbus import Listener
 from threading import RLock
+from pygments.token import Token
+from typing import List, Tuple, Any
 
 
 class Context(Listener):
@@ -22,6 +25,7 @@ class Context(Listener):
         self._testing = None
         self._registry = None
         self._args = {}
+        self._tier = ""
 
     def set_binary_name(self, name):
         self._binary_name = name
@@ -50,6 +54,10 @@ class Context(Listener):
         with self._lock:
             self._args.verbose = value
 
+    def set_tier(self, tier: str):
+        with self._lock:
+            self._tier = tier
+
     @property
     def binary_name(self):
         return self._binary_name
@@ -72,6 +80,17 @@ class Context(Listener):
     @property
     def isatty(self):
         return os.isatty(sys.stdin.fileno())
+
+    def get_prompt_tokens(self) -> List[Tuple[Any, str]]:
+        """
+        Override this and return your own prompt for interactive mode.
+        Expected to return a list of pygments Token tuples.
+        """
+        tokens = [(Token.Username, getpass.getuser())]
+        if self._tier:
+            tokens.extend([(Token.At, "@"), (Token.Tier, self._tier)])
+        tokens.extend([(Token.Colon, ""), (Token.Pound, "> ")])
+        return tokens
 
     def on_connected(self, *args, **kwargs):
         """
