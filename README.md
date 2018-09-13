@@ -10,7 +10,7 @@ _Disclaimer: Nubia is beta for non-ldshell use-cases. Some of the design decisio
 
 See the [CONTRIBUTING](CONTRIBUTING.md) file for how to help out.
 
-If you are curious on the origins of the name, checkout [Nubia on Wikipedia](https://en.wikipedia.org/wiki/Nubia) with it unique and colourful architecture.
+If you are curious on the origins of the name, checkout [Nubia on Wikipedia](https://en.wikipedia.org/wiki/Nubia) with its unique and colourful architecture.
 
 ## Key Features
 
