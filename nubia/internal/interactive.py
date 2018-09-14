@@ -27,10 +27,8 @@ from prompt_toolkit.layout.processors import (
 from prompt_toolkit.buffer import Buffer
 from termcolor import cprint
 from nubia.internal.ui.lexer import NubiaLexer
-from pygments.token import Token
 from typing import List, Tuple, Any
 
-import getpass
 import os
 
 from nubia.internal.io.eventbus import Listener
@@ -181,9 +179,7 @@ class IOLoop(Listener):
         self._status_bar.stop()
 
     def on_connected(self, *args, **kwargs):
-        if args:
-            tier = args[0]
-            self._ctx.set_tier(tier)
+        pass
 
     @classmethod
     def stop(cls):

@@ -25,7 +25,6 @@ class Context(Listener):
         self._testing = None
         self._registry = None
         self._args = {}
-        self._tier = ""
 
     def set_binary_name(self, name):
         self._binary_name = name
@@ -53,10 +52,6 @@ class Context(Listener):
 
         with self._lock:
             self._args.verbose = value
-
-    def set_tier(self, tier: str):
-        with self._lock:
-            self._tier = tier
 
     @property
     def binary_name(self):
@@ -86,10 +81,11 @@ class Context(Listener):
         Override this and return your own prompt for interactive mode.
         Expected to return a list of pygments Token tuples.
         """
-        tokens = [(Token.Username, getpass.getuser())]
-        if self._tier:
-            tokens.extend([(Token.At, "@"), (Token.Tier, self._tier)])
-        tokens.extend([(Token.Colon, ""), (Token.Pound, "> ")])
+        tokens = [
+            (Token.Username, getpass.getuser()),
+            (Token.Colon, ""),
+            (Token.Pound, "> "),
+        ]
         return tokens
 
     def on_connected(self, *args, **kwargs):

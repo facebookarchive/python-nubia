@@ -8,10 +8,8 @@
 #
 
 import argparse
-import getpass
 
 from typing import List, Tuple, Any
-from pygments.token import Token
 from nubia.internal.constants import DEFAULT_COMMAND_TIMEOUT
 from nubia.internal.ui import statusbar
 from nubia.internal.context import Context
@@ -119,7 +117,7 @@ class PluginInterface(object):
     def get_status_bar(self, context):
         return statusbar.StatusBar(context)
 
-    def get_prompt_tokens(self, context) -> List[Tuple[Any, str]]:
+    def get_prompt_tokens(self, context: Context) -> List[Tuple[Any, str]]:
         return context.get_prompt_tokens()
 
     def setup_logging(self, root_logger, args):
