@@ -10,9 +10,12 @@
 import copy
 import sys
 import os
+import getpass
 
 from nubia.internal.io.eventbus import Listener
 from threading import RLock
+from pygments.token import Token
+from typing import List, Tuple, Any
 
 
 class Context(Listener):
@@ -72,6 +75,18 @@ class Context(Listener):
     @property
     def isatty(self):
         return os.isatty(sys.stdin.fileno())
+
+    def get_prompt_tokens(self) -> List[Tuple[Any, str]]:
+        """
+        Override this and return your own prompt for interactive mode.
+        Expected to return a list of pygments Token tuples.
+        """
+        tokens = [
+            (Token.Username, getpass.getuser()),
+            (Token.Colon, ""),
+            (Token.Pound, "> "),
+        ]
+        return tokens
 
     def on_connected(self, *args, **kwargs):
         """
