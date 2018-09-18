@@ -27,9 +27,8 @@ from prompt_toolkit.layout.processors import (
 from prompt_toolkit.buffer import Buffer
 from termcolor import cprint
 from nubia.internal.ui.lexer import NubiaLexer
-from pygments.token import Token
+from typing import List, Tuple, Any
 
-import getpass
 import os
 
 from nubia.internal.io.eventbus import Listener
@@ -42,7 +41,6 @@ def split_command(text):
 
 
 class IOLoop(Listener):
-    _tier = ""
     stop_requested = False
 
     def __init__(self, context, plugin, usagelogger):
@@ -112,12 +110,8 @@ class IOLoop(Listener):
         cli = CommandLineInterface(application=application, eventloop=eventloop)
         return cli
 
-    def get_prompt_tokens(self, cli):
-        tokens = [(Token.Username, getpass.getuser())]
-        if self._tier:
-            tokens.extend([(Token.At, "@"), (Token.Tier, self._tier)])
-        tokens.extend([(Token.Colon, ""), (Token.Pound, "> ")])
-        return tokens
+    def get_prompt_tokens(self, cli) -> List[Tuple[Any, str]]:
+        return self._plugin.get_prompt_tokens(self._ctx)
 
     def parse_and_evaluate(self, stdout, input):
         command_parts = split_command(input)
@@ -185,9 +179,7 @@ class IOLoop(Listener):
         self._status_bar.stop()
 
     def on_connected(self, *args, **kwargs):
-        if args:
-            tier = args[0]
-            self._tier = tier
+        pass
 
     @classmethod
     def stop(cls):
