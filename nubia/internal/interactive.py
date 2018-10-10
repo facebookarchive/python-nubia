@@ -97,9 +97,11 @@ class IOLoop(Listener):
             accept_action=AcceptAction.RETURN_DOCUMENT,
         )
 
+        # If EDITOR does not exist, take EMACS
+        # if it does, try fit the EMACS/VI pattern using upper
         editor = getattr(EditingMode,
-                         os.environ.get("EDITOR", "EMACS").upper(),
-                         "EMACS")
+                         os.environ.get("EDITOR", EditingMode.EMACS).upper(),
+                         EditingMode.EMACS)
 
         application = Application(
             style=shell_style,
