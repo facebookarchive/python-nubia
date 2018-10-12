@@ -17,7 +17,7 @@ from prompt_toolkit.key_binding.manager import KeyBindingManager
 from prompt_toolkit import CommandLineInterface, Application, AbortAction
 from prompt_toolkit.shortcuts import create_prompt_layout, create_eventloop
 from prompt_toolkit.layout.lexers import PygmentsLexer
-from prompt_toolkit.enums import DEFAULT_BUFFER
+from prompt_toolkit.enums import DEFAULT_BUFFER, EditingMode
 from prompt_toolkit.filters import Always, HasFocus, IsDone
 from prompt_toolkit.buffer import AcceptAction
 from prompt_toolkit.layout.processors import (
@@ -97,9 +97,16 @@ class IOLoop(Listener):
             accept_action=AcceptAction.RETURN_DOCUMENT,
         )
 
+        # If EDITOR does not exist, take EMACS
+        # if it does, try fit the EMACS/VI pattern using upper
+        editor = getattr(EditingMode,
+                         os.environ.get("EDITOR", EditingMode.EMACS).upper(),
+                         EditingMode.EMACS)
+
         application = Application(
             style=shell_style,
             buffer=buf,
+            editing_mode=editor,
             key_bindings_registry=self._registry,
             layout=layout,
             on_exit=AbortAction.RAISE_EXCEPTION,
