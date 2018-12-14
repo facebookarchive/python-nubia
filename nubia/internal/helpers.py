@@ -12,9 +12,11 @@ import re
 import signal
 import string
 import subprocess
+import sys
 
 from collections import namedtuple
-from typing import _Union, Any, Iterable  # noqa T484
+from typing import Any, Union, Iterable  # noqa T484
+
 
 
 def add_command_arguments(parser, options):
@@ -168,6 +170,7 @@ def issubclass_(obj, class_):
 def is_union(t: Any) -> bool:
     """Check whether type is a Union.
 
+
     @param t: type to check
     @type: Any
     @returns: `True` if type is a Union, `False` otherwise
@@ -177,7 +180,13 @@ def is_union(t: Any) -> bool:
     https://github.com/ilevkivskyi/typing_inspect for the rationale behind the
     implementation.
     """
-    return type(t) is _Union
+    if sys.version_info[:3] >= (3, 7, 0):  # PEP 560
+        from typing import _GenericAlias
+        return (t is Union or
+                isinstance(t, _GenericAlias) and t.__origin__ is Union)
+    else:
+        from typing import _Union
+        return type(t) is _Union
 
 
 def is_optional(t: Any) -> bool:
