@@ -3,9 +3,8 @@ python:
     - "3.6"
 
 install:
-  - pip3 install pipenv
-  - pipenv install -d --system --three
-
+  - pip3 install pipenv nose
+  - python3 setup.py install
 
 script:
   - nosetests
@@ -14,4 +13,5 @@ notifications:
   email:
     recipients:
       - asoli@fb.com
+      - cmarchent@fb.com
     on_failure: change # default: always
