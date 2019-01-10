@@ -121,7 +121,7 @@ def start_server(hostnames: typing.List[str]):
     pass
 ```
 
-Since `hostnames` is defined as a `typing.List`, we expect the use to pass
+Since `hostnames` is defined as a `typing.List`, we expect the user to pass
 multiple values. A single value will automatically be lifted into a list of
 a single value `(x -> [x])`. Lists in CLI mode are space-separated values
 
