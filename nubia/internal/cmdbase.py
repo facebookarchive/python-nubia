@@ -273,7 +273,7 @@ class AutoCommand(Command):
                         len(can_be_positional),
                         ", ".join(can_be_positional.keys()),
                         len(positionals),
-                        ", ".join(positionals),
+                        ", ".join(str(x) for x in positionals)
                     )
                 cprint(err, "red")
                 return 2
