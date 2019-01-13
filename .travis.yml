@@ -3,11 +3,11 @@ python:
     - "3.6"
 
 install:
-  - pip3 install pipenv nose
-  - python3 setup.py install
+  - pip3 install poetry
+  - poetry install
 
 script:
-  - nosetests
+  - poetry run nosetests
 
 notifications:
   email:

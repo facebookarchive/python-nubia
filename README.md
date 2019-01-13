@@ -62,7 +62,8 @@ def lookup(hosts: typing.List[str], bad_name: int):
 
 ## Requirements
 
-Nubia-based applications require python 3.6+ and works with both Mac OS X or Linux. While in theory it should work on Windows, it has never been tried.
+Nubia-based applications require Python 3.6+ and works with both Mac OS X or Linux.
+While in theory it should work on Windows, it has never been tried.
 
 ## Installing Nubia
 
@@ -71,29 +72,28 @@ If you are installing nubia for your next project, you should be able to easily 
 pip3 install python-nubia
 ```
 
-## Building Nubia from source
+## Developing Nubia
+Nubia uses [Poetry](https://github.com/sdispater/poetry) for dependency management and builds.
+There are quite a few [installation options available](https://github.com/sdispater/poetry#installation) for Poetry.
 
-Ensure is pipenv installed:
+To start experimenting, install Nubia dependencies and the package itself:
 ```bash
-pip3 install pipenv
-```
-You can either setup.py to build a tarball, or use pipenv to setup a virtualenv with all the dependencies installed.
-
-## Running example in virtualenv:
-
-If you would like to run the example, then you need to add the root of the source tree into your PYTHONPATH.
-```bash
-pipenv update --dev
-pipenv shell
-
-export PYTHONPATH="$(pwd)"
-cd example/
-python nubia_example.py
+poetry install
 ```
 
-To run the unit tests:
+Make sure all the tests pass:
 ```bash
-pipenv run nosetests
+poetry run nosetests
+```
+
+Running the provided example is as simple as:
+```bash
+poetry run example/nubia_example.py
+```
+
+When you are ready, use the following command to build a wheel, sdist or both (default).
+```bash
+poetry build
 ```
 
 ## Getting Started

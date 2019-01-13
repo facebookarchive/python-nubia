@@ -4,10 +4,43 @@
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
 
-# NOTE: you have to use single-quoted strings in TOML for regular expressions.
-# It's the equivalent of r-strings in Python.  Multiline strings are treated as
-# verbose regular expressions by Black.  Use [ ] to denote a significant space
-# character.
+[tool.poetry]
+name = "python-nubia"
+version = "0.1.b4"
+description = "A framework for building beautiful shells"
+authors = [
+    "Ahmed Soliman <asoli@fb.com>"
+]
+license = "BSD"
+
+readme = "README.md"
+homepage = "https://github.com/facebookincubator/python-nubia"
+keywords = ["cli", "shell", "interactive", "framework"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+]
+
+packages = [
+    { include = "nubia"},
+    { include = "nubia_complete" },
+]
+
+[tool.poetry.dependencies]
+python = "~3.6"
+prettytable = "^0.7"
+prompt-toolkit = "^1"
+pygments = "^2.3"
+pyparsing = "^2.3"
+python-Levenshtein = "^0.12"
+termcolor = "^1.1"
+
+[tool.poetry.dev-dependencies]
+nose = "^1.3"
+ipdb = "^0.11"
 
 [tool.black]
 line-length = 80
@@ -26,3 +59,7 @@ exclude = '''
   | dist
 )/
 '''
+
+[build-system]
+requires = ["poetry>=0.12.10"]
+build-backend = "poetry.masonry.api"
