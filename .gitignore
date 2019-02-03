@@ -2,6 +2,6 @@ sample/Pipfile.lock
 build
 dist
 **/__pycache__/
-**.pyc
+**/*.pyc
 *.egg-info
 .mypy_cache
