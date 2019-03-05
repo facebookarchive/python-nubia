@@ -19,6 +19,7 @@ from termcolor import cprint
 
 from nubia.internal import context
 from nubia.internal import exceptions
+from nubia.internal.options import Options
 from nubia.internal.typing.argparse import create_subparser_class
 from nubia.internal.blackcmd import CommandBlacklist
 from nubia.internal.commands import builtin
@@ -71,9 +72,10 @@ class Nubia(object):
     plugin it will load on startup.
     """
 
-    def __init__(self, name, plugin=None, testing=False):
+    def __init__(self, name, plugin=None, testing=False, options: Options = None):
         self._name = name
         self._plugin = plugin or PluginInterface()
+        self._options = options or Options()
         assert isinstance(self._plugin, PluginInterface)
         self._blacklist = self._plugin.getBlacklistPlugin()
         if self._blacklist is not None:
@@ -94,9 +96,7 @@ class Nubia(object):
         self._opts_parser = self._plugin.get_opts_parser()
         SubParser = create_subparser_class(self._opts_parser)
         self._opts_parser.add_argument(
-            "--_print-completion-model",
-            action="store_true",
-            help=argparse.SUPPRESS,
+            "--_print-completion-model", action="store_true", help=argparse.SUPPRESS
         )
 
         cmd_parser = self._opts_parser.add_subparsers(
@@ -157,9 +157,7 @@ class Nubia(object):
     def start_ipython(self, args):
         from nubia.internal.ipython import start_interactive_python
 
-        return start_interactive_python(
-            self._plugin, self._registry, self._ctx, args
-        )
+        return start_interactive_python(self._plugin, self._registry, self._ctx, args)
 
     @property
     def usage_logger(self):
@@ -183,7 +181,7 @@ class Nubia(object):
             os.environ["ANSI_COLORS_DISABLED"] = "True"
 
     def _create_interactive_io_loop(self, args):
-        io_loop = IOLoop(self._ctx, self._plugin, self.usage_logger)
+        io_loop = IOLoop(self._ctx, self._plugin, self.usage_logger, self._options)
         self._ctx.on_interactive(args)
         return io_loop
 
@@ -296,9 +294,7 @@ class Nubia(object):
             return self.start_interactive(args)
         else:
             ret = self.run_cli(args)
-            catchall(
-                self.usage_logger.post_exec, args._cmd, cli_args, ret, True
-            )
+            catchall(self.usage_logger.post_exec, args._cmd, cli_args, ret, True)
 
         if type(ret) is int:
             return ret

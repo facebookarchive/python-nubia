@@ -10,6 +10,7 @@ pyparsing = "*"
 prettytable = "*"
 prompt-toolkit = "<=2"
 pygments = "*"
+dataclasses = "*"
 
 [dev-packages]
 nose = "*"

@@ -12,7 +12,7 @@ import logging
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from prompt_toolkit.completion import Completer
 from prompt_toolkit.document import Document
-from prompt_toolkit.history import FileHistory
+from prompt_toolkit.history import FileHistory, InMemoryHistory
 from prompt_toolkit.key_binding.manager import KeyBindingManager
 from prompt_toolkit import CommandLineInterface, Application, AbortAction
 from prompt_toolkit.shortcuts import create_prompt_layout, create_eventloop
@@ -31,6 +31,7 @@ from typing import List, Tuple, Any
 
 import os
 
+from nubia.internal.options import Options
 from nubia.internal.io.eventbus import Listener
 from nubia.internal.helpers import catchall
 from nubia.internal.ui.style import shell_style
@@ -43,10 +44,11 @@ def split_command(text):
 class IOLoop(Listener):
     stop_requested = False
 
-    def __init__(self, context, plugin, usagelogger):
+    def __init__(self, context, plugin, usagelogger, options: Options):
         self._ctx = context
         self._command_registry = self._ctx.registry
         self._plugin = plugin
+        self._options = options
         self._blacklist = self._plugin.getBlacklistPlugin()
 
         self._status_bar = self._plugin.get_status_bar(context)
@@ -66,12 +68,14 @@ class IOLoop(Listener):
     def _build_cli(self):
         eventloop = create_eventloop()
 
-        history = FileHistory(
-            os.path.join(
-                os.path.expanduser("~"),
-                ".{}_history".format(self._ctx.binary_name),
+        if self._options.persistent_history:
+            history = FileHistory(
+                os.path.join(
+                    os.path.expanduser("~"), ".{}_history".format(self._ctx.binary_name)
+                )
             )
-        )
+        else:
+            history = InMemoryHistory()
 
         layout = create_prompt_layout(
             lexer=PygmentsLexer(NubiaLexer),
@@ -99,9 +103,11 @@ class IOLoop(Listener):
 
         # If EDITOR does not exist, take EMACS
         # if it does, try fit the EMACS/VI pattern using upper
-        editor = getattr(EditingMode,
-                         os.environ.get("EDITOR", EditingMode.EMACS).upper(),
-                         EditingMode.EMACS)
+        editor = getattr(
+            EditingMode,
+            os.environ.get("EDITOR", EditingMode.EMACS).upper(),
+            EditingMode.EMACS,
+        )
 
         application = Application(
             style=shell_style,
@@ -212,16 +218,11 @@ class ShellCompleter(Completer):
                 return cmd_instance.get_completions(
                     cmd,
                     Document(
-                        args,
-                        document.cursor_position
-                        - len(document.text)
-                        + len(args),
+                        args, document.cursor_position - len(document.text) + len(args)
                     ),
                     complete_event,
                 )
             else:
-                return self._command_registry.get_completions(
-                    document, complete_event
-                )
+                return self._command_registry.get_completions(document, complete_event)
 
         return []
