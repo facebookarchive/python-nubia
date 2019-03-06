@@ -13,6 +13,7 @@ from .internal.deprecation import deprecated
 from .internal.io import eventbus
 from .internal.ui import statusbar
 from .internal.nubia import Nubia
+from .internal.options import Options
 from .internal.plugin_interface import PluginInterface, CompletionDataSource
 from .internal.typing import argument
 from .internal.typing import command
@@ -20,15 +21,16 @@ from .internal.typing import command
 name = "nubia"
 
 __all__ = [
-    "Nubia",
     "CompletionDataSource",
+    "Nubia",
+    "Options",
     "PluginInterface",
-    "deprecated",
-    "exceptions",
-    "context",
-    "eventbus",
-    "command",
     "argument",
+    "command",
+    "context",
+    "deprecated",
+    "eventbus",
+    "exceptions",
     "statusbar",
 ]
 
