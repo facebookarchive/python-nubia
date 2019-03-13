@@ -6,7 +6,7 @@ name = "pypi"
 [packages]
 termcolor = "*"
 python-Levenshtein = "*"
-pyparsing = "*"
+pyparsing = "<=2.2"
 prettytable = "*"
 prompt-toolkit = "<=2"
 pygments = "*"
