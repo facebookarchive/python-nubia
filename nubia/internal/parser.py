@@ -95,7 +95,8 @@ positionals = pp.ZeroOrMore(
     value + (pp.StringEnd() ^ pp.Suppress(pp.OneOrMore(pp.White())))
 ).setResultsName("positionals")
 
-key_value = pp.dictOf(identifier + pp.Suppress("="), value).setResultsName("kv")
+key_value = pp.Dict(pp.ZeroOrMore(pp.Group(
+    identifier + pp.Suppress("=") + value))).setResultsName("kv")
 
 subcommand = identifier.setResultsName("__subcommand__")
 
