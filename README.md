@@ -73,27 +73,36 @@ pip3 install python-nubia
 
 ## Building Nubia from source
 
-Ensure is pipenv installed:
-```bash
-pip3 install pipenv
-```
 You can either setup.py to build a tarball, or use pipenv to setup a virtualenv with all the dependencies installed.
 
 ## Running example in virtualenv:
 
+It's often best to create a virtualenv to contain the dependencies required for python-nubia project.
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
 If you would like to run the example, then you need to add the root of the source tree into your PYTHONPATH.
 ```bash
-pipenv update --dev
-pipenv shell
+virtualenv .venv
+source .venv/bin/activate
 
 export PYTHONPATH="$(pwd)"
-cd example/
-python nubia_example.py
+python3 example/nubia_example.py
 ```
 
 To run the unit tests:
+
+From within the virtualenv you can use nosetests:
 ```bash
-pipenv run nosetests
+nosetests
+```
+
+Or if you don't want to create a virtualenv, just use:
+```bash
+python3 setup.py nosetests
 ```
 
 ## Getting Started

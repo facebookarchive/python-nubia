@@ -2,16 +2,11 @@ language: python
 python:
     - "3.6"
 
-install:
-  - pip3 install pipenv nose
-  - python3 setup.py install
-
 script:
-  - nosetests
+  - python3 setup.py nosetests
 
 notifications:
   email:
     recipients:
       - asoli@fb.com
-      - cmarchent@fb.com
     on_failure: change # default: always
