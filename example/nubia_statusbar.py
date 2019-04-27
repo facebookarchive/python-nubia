@@ -17,7 +17,7 @@ class NubiaExampleStatusBar(statusbar.StatusBar):
     def __init__(self, context):
         self._last_status = None
 
-    def get_rprompt_tokens(self, cli):
+    def get_rprompt_tokens(self):
         if self._last_status:
             return [(Token.RPrompt, "Error: {}".format(self._last_status))]
         return []
@@ -25,7 +25,7 @@ class NubiaExampleStatusBar(statusbar.StatusBar):
     def set_last_command_status(self, status):
         self._last_status = status
 
-    def get_tokens(self, cli):
+    def get_tokens(self):
         spacer = (Token.Spacer, "  ")
         if context.get_context().verbose:
             is_verbose = (Token.Warn, "ON")

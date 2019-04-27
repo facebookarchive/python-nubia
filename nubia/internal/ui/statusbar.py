@@ -21,16 +21,16 @@ class StatusBar(eventbus.Listener):
         """
         pass
 
-    def get_rprompt_tokens(self, cli):
+    def get_rprompt_tokens(self):
         return []
 
     def set_last_command_status(self, status):
         pass
 
-    def get_tokens(self, cli):
+    def get_tokens(self):
         return []
 
-    def start(self, cli):
+    def start(self):
         pass
 
     def stop(self):

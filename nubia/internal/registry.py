@@ -12,7 +12,7 @@ import Levenshtein
 from nubia.internal.cmdbase import Command
 from nubia.internal.io.eventbus import Listener
 
-from prompt_toolkit.contrib.completers import WordCompleter
+from prompt_toolkit.completion import WordCompleter
 
 from termcolor import cprint
 

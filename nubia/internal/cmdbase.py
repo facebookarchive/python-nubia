@@ -16,8 +16,7 @@ import typing
 from typing import Iterable
 from collections import OrderedDict
 
-from prompt_toolkit.completion import Completion
-from prompt_toolkit.contrib.completers import WordCompleter
+from prompt_toolkit.completion import Completion, WordCompleter
 from prompt_toolkit.document import Document
 from prompt_toolkit.completion import CompleteEvent
 from termcolor import cprint
@@ -88,9 +87,7 @@ class Command(object):
         """
         return {}
 
-    def get_completions(
-        self, cmd, document, complete_event
-    ) -> Iterable[Completion]:
+    def get_completions(self, cmd, document, complete_event) -> Iterable[Completion]:
         """
         This function SHOULD be implemented to feed the interactive auto
         completion of command arguments. Example: auto complete the available
@@ -155,8 +152,7 @@ class AutoCommand(Command):
                 "Expecting either a function (eg. bar) or "
                 "a bound method (eg. Foo().bar). "
                 "You passed what appears to be an unbound method "
-                "(eg. Foo.bar) it has a 'self' argument: %s"
-                % function_to_str(fn)
+                "(eg. Foo.bar) it has a 'self' argument: %s" % function_to_str(fn)
             )
 
         if not self.metadata.command:
@@ -193,14 +189,10 @@ class AutoCommand(Command):
         """
         kwargs = {
             k: v
-            for k, v in get_arguments_for_inspection(
-                self.metadata, key_values
-            ).items()
+            for k, v in get_arguments_for_inspection(self.metadata, key_values).items()
             if v is not None
         }
-        remaining = {
-            k: v for k, v in key_values.items() if k not in kwargs.keys()
-        }
+        remaining = {k: v for k, v in key_values.items() if k not in kwargs.keys()}
         return self._fn(**kwargs), remaining
 
     def run_interactive(self, cmd, args, raw):
@@ -228,15 +220,11 @@ class AutoCommand(Command):
                 if not sub_inspection:
                     cprint(
                         "Invalid sub-command '{}', valid values: "
-                        "{}".format(
-                            subcommand, ", ".join(self._get_subcommands())
-                        ),
+                        "{}".format(subcommand, ", ".join(self._get_subcommands())),
                         "red",
                     )
                     return 2
-                instance, remaining_args = self._create_subcommand_obj(
-                    args_dict
-                )
+                instance, remaining_args = self._create_subcommand_obj(args_dict)
                 assert instance
                 args_dict = remaining_args
                 key_values = copy.copy(args_dict)
@@ -248,9 +236,7 @@ class AutoCommand(Command):
             else:
                 # not a super-command, use use the function instead
                 fn = self._fn
-            positionals = (
-                parsed_dict["positionals"] if parsed.positionals != "" else []
-            )
+            positionals = parsed_dict["positionals"] if parsed.positionals != "" else []
             # We only allow positionals for arguments that have positional=True
             # ِ We filter out the OrderedDict this way to ensure we don't lose the
             # order of the arguments. We also filter out arguments that have
@@ -273,7 +259,7 @@ class AutoCommand(Command):
                         len(can_be_positional),
                         ", ".join(can_be_positional.keys()),
                         len(positionals),
-                        ", ".join(str(x) for x in positionals)
+                        ", ".join(str(x) for x in positionals),
                     )
                 cprint(err, "red")
                 return 2
@@ -311,8 +297,7 @@ class AutoCommand(Command):
             extra_keys = set(args_dict.keys()) - set(args_metadata)
             if extra_keys:
                 cprint(
-                    "Unknown argument(s) {} were"
-                    " passed".format(list(extra_keys)),
+                    "Unknown argument(s) {} were" " passed".format(list(extra_keys)),
                     "magenta",
                 )
                 return 2
@@ -381,9 +366,7 @@ class AutoCommand(Command):
             # arguments appear to be fine, time to run the function
             try:
                 # convert argument names back to match the function signature
-                args_dict = {
-                    args_metadata[k].arg: v for k, v in args_dict.items()
-                }
+                args_dict = {args_metadata[k].arg: v for k, v in args_dict.items()}
                 if inspect.iscoroutinefunction(fn):
                     loop = asyncio.get_event_loop()
                     ret = loop.run_until_complete(fn(**args_dict))
@@ -431,10 +414,7 @@ class AutoCommand(Command):
 
     def _get_subcommands(self) -> Iterable[str]:
         assert self.super_command
-        return [
-            inspection.command.name
-            for _, inspection in self.metadata.subcommands
-        ]
+        return [inspection.command.name for _, inspection in self.metadata.subcommands]
 
     def _kwargs_for_fn(self, fn, args):
         return {
