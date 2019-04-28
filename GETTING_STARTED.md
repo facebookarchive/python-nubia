@@ -107,6 +107,7 @@ defined in the function signature.
 `--argument-name` when running the command (in CLI mode). If you would like to
 have the argument supplied as a positional value, you need to set
 `positional=True` in the `@argument` decorator as indicated in this example
+- `description` parameter of `@argument` decorator is mandatory.
 
 ```python
 import typing
