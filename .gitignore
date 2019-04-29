@@ -5,3 +5,6 @@ dist
 **/*.pyc
 *.egg-info
 .mypy_cache
+.python-version
+.venv*
+.eggs

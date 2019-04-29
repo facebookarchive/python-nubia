@@ -1,0 +1,9 @@
+dataclasses
+prettytable
+prompt-toolkit<=2
+Pygments
+pyparsing>=2.2.0
+python-Levenshtein
+six>=1.9
+termcolor
+wcwidth
