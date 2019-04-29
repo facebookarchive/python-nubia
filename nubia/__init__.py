@@ -34,4 +34,4 @@ __all__ = [
     "statusbar",
 ]
 
-__version__ = "0.1b5"
+__version__ = "0.1b6"
