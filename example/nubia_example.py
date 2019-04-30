@@ -10,9 +10,14 @@
 import sys
 from nubia import Nubia, Options
 from nubia_plugin import NubiaExamplePlugin
+import example.commands
 
 if __name__ == "__main__":
     plugin = NubiaExamplePlugin()
-    shell = Nubia(name="nubia_example", plugin=plugin,
-            options=Options(persistent_history=False))
+    shell = Nubia(
+        name="nubia_example",
+        command_pkgs=example.commands,
+        plugin=plugin,
+        options=Options(persistent_history=False),
+    )
     sys.exit(shell.run())
