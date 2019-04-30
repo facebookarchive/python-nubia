@@ -10,14 +10,12 @@
 import argparse
 import inspect
 import typing
-import six
 import unittest
+from io import StringIO
 
 from nubia.internal.typing import command, argument
 from nubia.internal.typing.argparse import add_command, find_command
 from nubia.internal.typing.builder import build_value
-
-from six import StringIO
 
 
 class ParseError(Exception):
@@ -664,7 +662,7 @@ class ArgparseExtensionTest(unittest.TestCase):
             add_command(parser, foo)
 
     def _test(self, command_function, arguments, expected_result):
-        if isinstance(arguments, six.string_types):
+        if isinstance(arguments, str):
             arguments = arguments.split()
 
         parser = ContainedParser()

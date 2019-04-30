@@ -14,7 +14,6 @@ import sys
 import typing
 
 from functools import wraps
-from six import string_types, reraise
 
 from nubia.internal.helpers import issubclass_, is_union
 
@@ -86,7 +85,7 @@ def get_typing_function(type):
         func = get_typing_function(subtypes[0])
     elif type == typing.Any:
         func = _identity_function
-    elif issubclass_(type, string_types):
+    elif issubclass_(type, str):
         func = str
     elif issubclass_(type, collections.Mapping):
         func = _apply_dict_type
@@ -118,18 +117,17 @@ def get_typing_function(type):
 def _safe_eval(string):
     try:
         return ast.literal_eval(string)
-    except ValueError:
+    except ValueError as e:
         _, e, tb = sys.exc_info()
         if str(e) == "malformed string":
-            # raise a more meaningful, nicer error
-            msg = '"{}" uses unsafe token/symbols'.format(string)
-            reraise(ValueError, ValueError(msg), tb)
+            # Raise a more meaningful, nicer error
+            raise ValueError(f"`{string}' uses unsafe token/symbols") from e
         else:
             raise
 
 
 def _build_simple_value(string, type):
-    if not type or issubclass_(type, string_types):
+    if not type or issubclass_(type, str):
         return string
     elif issubclass_(type, collections.Mapping):
         entries = (

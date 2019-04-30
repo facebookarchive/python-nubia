@@ -63,7 +63,6 @@ import inspect
 
 from collections import namedtuple, Container, OrderedDict
 from functools import partial
-from six import string_types
 
 from nubia.internal.helpers import (
     get_arg_spec,
@@ -348,11 +347,11 @@ def _normalize_exclusive_arguments(exclusive_arguments):
     """
 
     def all_string_items(items):
-        return all(isinstance(item, string_types) for item in items)
+        return all(isinstance(item, str) for item in items)
 
     def all_container_items(items):
         return all(
-            isinstance(item, Container) and not isinstance(item, string_types)
+            isinstance(item, Container) and not isinstance(item, str)
             for item in items
         )
 
