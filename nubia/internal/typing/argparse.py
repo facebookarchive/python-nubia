@@ -9,8 +9,8 @@
 
 import argparse
 import os
+import shutil
 import subprocess
-import six
 import copy
 import sys
 
@@ -332,19 +332,12 @@ class NubiaHelpAction(argparse.Action):
 
     def __call__(self, parser, namespace, values, option_string=None):
         help_message = parser.format_help()
-        if six.PY2:  # deprecated
-            fits_one_page = False
-        else:  # assume Python 3
-            import shutil
-
-            help_message_length = len(help_message.split("\n"))
-            _, rows = shutil.get_terminal_size()
-            fits_one_page = help_message_length <= rows
-        pager = os.environ.get("PAGER", "less")
+        help_message_length = len(help_message.split("\n"))
+        _, rows = shutil.get_terminal_size()
+        fits_one_page = help_message_length <= rows
         if sys.stdout.isatty() and not fits_one_page:
-            p = subprocess.Popen([pager], stdin=subprocess.PIPE)
-            p.communicate(input=six.b(help_message))
-            p.wait()
+            pager = os.environ.get("PAGER", "less")
+            subprocess.run([pager], input=help_message.encode())
         else:  # fallback
             parser.print_help()
         parser.exit()
