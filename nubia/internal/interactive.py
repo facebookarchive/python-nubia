@@ -7,33 +7,27 @@
 # LICENSE file in the root directory of this source tree.
 #
 
+from typing import List, Tuple, Any
 import logging
+import os
+import sys
 
+from prompt_toolkit import PromptSession
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from prompt_toolkit.completion import Completer
 from prompt_toolkit.document import Document
+from prompt_toolkit.enums import EditingMode
+from prompt_toolkit.formatted_text import PygmentsTokens
 from prompt_toolkit.history import FileHistory, InMemoryHistory
-from prompt_toolkit.key_binding.manager import KeyBindingManager
-from prompt_toolkit import CommandLineInterface, Application, AbortAction
-from prompt_toolkit.shortcuts import create_prompt_layout, create_eventloop
-from prompt_toolkit.layout.lexers import PygmentsLexer
-from prompt_toolkit.enums import DEFAULT_BUFFER, EditingMode
-from prompt_toolkit.filters import Always, HasFocus, IsDone
-from prompt_toolkit.buffer import AcceptAction
-from prompt_toolkit.layout.processors import (
-    ConditionalProcessor,
-    HighlightMatchingBracketProcessor,
-)
-from prompt_toolkit.buffer import Buffer
-from termcolor import cprint
+from prompt_toolkit.layout.processors import HighlightMatchingBracketProcessor
+from prompt_toolkit.lexers import PygmentsLexer
+
 from nubia.internal.ui.lexer import NubiaLexer
-from typing import List, Tuple, Any
+from termcolor import cprint
 
-import os
-
-from nubia.internal.options import Options
-from nubia.internal.io.eventbus import Listener
 from nubia.internal.helpers import catchall
+from nubia.internal.io.eventbus import Listener
+from nubia.internal.options import Options
 from nubia.internal.ui.style import shell_style
 
 
@@ -42,32 +36,18 @@ def split_command(text):
 
 
 class IOLoop(Listener):
-    stop_requested = False
-
     def __init__(self, context, plugin, usagelogger, options: Options):
         self._ctx = context
         self._command_registry = self._ctx.registry
         self._plugin = plugin
         self._options = options
         self._blacklist = self._plugin.getBlacklistPlugin()
-
         self._status_bar = self._plugin.get_status_bar(context)
-        self._manager = KeyBindingManager(
-            enable_abort_and_exit_bindings=True,
-            enable_system_bindings=True,
-            enable_search=True,
-            enable_auto_suggest_bindings=True,
-        )
-        self._registry = self._manager.registry
-        self._cli = None
-        self._suggestor = AutoSuggestFromHistory()
         self._completer = ShellCompleter(self._command_registry)
         self._command_registry.register_listener(self)
         self._usagelogger = usagelogger
 
     def _build_cli(self):
-        eventloop = create_eventloop()
-
         if self._options.persistent_history:
             history = FileHistory(
                 os.path.join(
@@ -77,30 +57,6 @@ class IOLoop(Listener):
         else:
             history = InMemoryHistory()
 
-        layout = create_prompt_layout(
-            lexer=PygmentsLexer(NubiaLexer),
-            reserve_space_for_menu=5,
-            get_prompt_tokens=self.get_prompt_tokens,
-            get_rprompt_tokens=self._status_bar.get_rprompt_tokens,
-            get_bottom_toolbar_tokens=self._status_bar.get_tokens,
-            display_completions_in_columns=False,
-            multiline=True,
-            extra_input_processors=[
-                ConditionalProcessor(
-                    processor=HighlightMatchingBracketProcessor(chars="[](){}"),
-                    filter=HasFocus(DEFAULT_BUFFER) & ~IsDone(),
-                )
-            ],
-        )
-
-        buf = Buffer(
-            completer=self._completer,
-            history=history,
-            auto_suggest=self._suggestor,
-            complete_while_typing=Always(),
-            accept_action=AcceptAction.RETURN_DOCUMENT,
-        )
-
         # If EDITOR does not exist, take EMACS
         # if it does, try fit the EMACS/VI pattern using upper
         editor = getattr(
@@ -109,33 +65,36 @@ class IOLoop(Listener):
             EditingMode.EMACS,
         )
 
-        application = Application(
+        return PromptSession(
+            history=history,
+            auto_suggest=AutoSuggestFromHistory(),
+            lexer=PygmentsLexer(NubiaLexer),
+            completer=self._completer,
+            input_processors=[HighlightMatchingBracketProcessor(chars="[](){}")],
             style=shell_style,
-            buffer=buf,
+            bottom_toolbar=self._get_bottom_toolbar,
             editing_mode=editor,
-            key_bindings_registry=self._registry,
-            layout=layout,
-            on_exit=AbortAction.RAISE_EXCEPTION,
-            on_abort=AbortAction.RETRY,
-            ignore_case=True,
+            complete_in_thread=True,
+            refresh_interval=1,
+            include_default_pygments_style=False,
         )
 
-        cli = CommandLineInterface(application=application, eventloop=eventloop)
-        return cli
-
-    def get_prompt_tokens(self, cli) -> List[Tuple[Any, str]]:
+    def _get_prompt_tokens(self) -> List[Tuple[Any, str]]:
         return self._plugin.get_prompt_tokens(self._ctx)
 
-    def parse_and_evaluate(self, stdout, input):
+    def _get_bottom_toolbar(self) -> List[Tuple[Any, str]]:
+        return PygmentsTokens(self._status_bar.get_tokens())
+
+    def parse_and_evaluate(self, input):
         command_parts = split_command(input)
         if command_parts and command_parts[0]:
             cmd = command_parts[0]
             args = command_parts[1] if len(command_parts) > 1 else None
-            return self.evaluate_command(stdout, cmd, args, input)
+            return self.evaluate_command(cmd, args, input)
 
-    def evaluate_command(self, stdout, cmd, args, raw):
+    def evaluate_command(self, cmd, args, raw):
         if cmd not in self._command_registry:
-            print(file=stdout)
+            print()
             cprint(
                 "Unknown Command '{}',{} type :help to see all "
                 "available commands".format(
@@ -143,7 +102,6 @@ class IOLoop(Listener):
                 ),
                 "magenta",
                 attrs=["bold"],
-                file=stdout,
             )
         else:
             if args is None:
@@ -168,35 +126,32 @@ class IOLoop(Listener):
                 self._status_bar.set_last_command_status(result)
                 return result
             except NotImplementedError as e:
-                cprint(
-                    "[NOT IMPLEMENTED]: {}".format(str(e)),
-                    "yellow",
-                    attrs=["bold"],
-                    file=stdout,
-                )
+                cprint("[NOT IMPLEMENTED]: {}".format(str(e)), "yellow", attrs=["bold"])
                 # not implemented error code
                 return 99
 
     def run(self):
-        self._cli = self._build_cli()
-        stdout = self._cli.stdout_proxy(True)
-        self._status_bar.start(self._cli)
+        prompt = self._build_cli()
+        self._status_bar.start()
         try:
-            while not self.stop_requested:
-                document = self._cli.run()
-                text = document.text
-                self.parse_and_evaluate(stdout, text)
-        except (EOFError, KeyboardInterrupt):
-            IOLoop.stop()
-
+            while True:
+                try:
+                    text = prompt.prompt(
+                        PygmentsTokens(self._get_prompt_tokens()),
+                        rprompt=PygmentsTokens(
+                            self._status_bar.get_rprompt_tokens()
+                        ),
+                    )
+                    self.parse_and_evaluate(text)
+                except KeyboardInterrupt:
+                    pass
+        except EOFError:
+            # Application exiting.
+            pass
         self._status_bar.stop()
 
     def on_connected(self, *args, **kwargs):
         pass
-
-    @classmethod
-    def stop(cls):
-        cls.stop_requested = True
 
 
 class ShellCompleter(Completer):

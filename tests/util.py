@@ -40,9 +40,9 @@ class TestShell(Nubia):
         args = self._pre_run(cli_args_list)
         return self.run_cli(args)
 
-    def run_interactive_line(self, raw_line, cli_args=None, stdout=sys.stdout):
+    def run_interactive_line(self, raw_line, cli_args=None):
         cli_args = cli_args or "test_shell connect"
         cli_args_list = cli_args.split()
         args = self._pre_run(cli_args_list)
         io_loop = self._create_interactive_io_loop(args)
-        return io_loop.parse_and_evaluate(stdout, raw_line)
+        return io_loop.parse_and_evaluate(raw_line)

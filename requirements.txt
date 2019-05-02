@@ -1,6 +1,6 @@
 dataclasses
 prettytable
-prompt-toolkit<=2
+prompt-toolkit>=2
 Pygments
 pyparsing>=2.2.0
 python-Levenshtein
