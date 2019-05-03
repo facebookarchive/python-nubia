@@ -53,7 +53,7 @@ class Exit(Command):
         self._built_in = True
 
     def run_interactive(self, cmd, args, raw):
-        IOLoop.stop()
+        raise EOFError()
         return 0
 
     def get_command_names(self):
