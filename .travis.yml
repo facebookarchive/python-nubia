@@ -2,11 +2,16 @@ language: python
 python:
     - "3.6"
 
+install:
+    - pip install codecov
 script:
-  - python3 setup.py nosetests
+  - python3 setup.py nosetests --with-coverage --cover-package=nubia
 
 notifications:
   email:
     recipients:
       - asoli@fb.com
     on_failure: change # default: always
+
+after_success:
+  - codecov

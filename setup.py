@@ -54,7 +54,7 @@ setuptools.setup(
     url="https://github.com/facebookincubator/python-nubia",
     packages=setuptools.find_packages(exclude=["sample", "docs", "tests"]),
     python_requires=">=3.6",
-    setup_requires=["nose>=1.0"],
+    setup_requires=["nose>=1.0", "coverage"],
     tests_require=["nose>=1.0"],
     install_requires=reqs,
     classifiers=(
