@@ -8,3 +8,4 @@ dist
 .python-version
 .venv*
 .eggs
+.coverage

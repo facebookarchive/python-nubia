@@ -1,6 +1,7 @@
 # python-nubia
 
 [![Build Status](https://travis-ci.com/facebookincubator/python-nubia.svg?token=aPxsLj8RpMSsSYqaqL5e&branch=master)](https://travis-ci.com/facebookincubator/python-nubia)
+[![Coverage](https://codecov.io/gh/facebookincubator/python-nubia/branch/master/graph/badge.svg)](https://codecov.io/github/facebookincubator/python-nubia)
 
 Nubia is a lightweight framework for building command-line applications with Python. It was originally designed for the “logdevice interactive shell (aka. `ldshell`)” at Facebook. Since then it was factored out to be a reusable component and several internal Facebook projects now rely on it as a quick and easy way to get an intuitive shell/cli application without too much boilerplate.
 
