@@ -13,7 +13,6 @@ from typing import Dict, List, Optional, Union
 from nubia.internal.helpers import (
     catchall,
     function_to_str,
-    get_left_type,
     is_optional,
     is_union,
 )
@@ -30,9 +29,9 @@ class HelpersTest(unittest.TestCase):
             )
 
         test("foo", False, False)
-        test("tests.helpers.foo", True, False)
+        test("helpers_test.foo", True, False)
         test("foo(arg1, arg2, *args, **kwargs)", False, True)
-        test("tests.helpers.foo(arg1, arg2, *args, **kwargs)", True, True)
+        test("helpers_test.foo(arg1, arg2, *args, **kwargs)", True, True)
 
     def test_catchall(self):
         def raise_generic_error():
@@ -60,9 +59,3 @@ class HelpersTest(unittest.TestCase):
         self.assertFalse(is_optional(Union[str, int]))
         self.assertTrue(is_optional(Optional[str]))
         self.assertTrue(is_optional(Union[str, None]))
-
-    def test_get_left_type(self):
-        self.assertIs(get_left_type(Union[str, None]), str)
-        self.assertIs(get_left_type(Optional[str]), str)
-        self.assertIsNot(get_left_type(Union[str, None]), None)
-        self.assertIsNot(get_left_type(Optional[str]), None)
