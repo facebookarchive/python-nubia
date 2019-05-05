@@ -56,6 +56,7 @@ setuptools.setup(
     python_requires=">=3.6",
     setup_requires=["nose>=1.0", "coverage"],
     tests_require=["nose>=1.0"],
+    entry_points={"console_scripts": ["_nubia_complete = nubia_complete.main:main"]},
     install_requires=reqs,
     classifiers=(
         "Development Status :: 4 - Beta",

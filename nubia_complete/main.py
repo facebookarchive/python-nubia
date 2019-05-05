@@ -16,14 +16,16 @@ from nubia_complete.shell import generate_shell_setup
 logger = logging.getLogger(__name__)
 
 
-def main(args):
+def main():
+    sys.exit(run(sys.argv))
+
+
+def run(args):
     opts_parser = argparse.ArgumentParser(
         description="A shell completion utility for nubia programs"
     )
 
-    subparsers = opts_parser.add_subparsers(
-        help="sub-command help", dest="mode"
-    )
+    subparsers = opts_parser.add_subparsers(help="sub-command help", dest="mode")
     opts_parser.add_argument(
         "--loglevel",
         type=str,
@@ -36,15 +38,12 @@ def main(args):
         "generate-shell-setup",
         help="Generates a bash/zsh " "setup script that you can source",
     )
-    complete_parser = subparsers.add_parser(
-        "complete", help="Triggers " "completions"
-    )
+    complete_parser = subparsers.add_parser("complete", help="Triggers " "completions")
     generate_parser.add_argument(
         "--target-binary-name",
         type=str,
         required=True,
-        help="The name of the nubia program we want "
-        "to generate a completer for",
+        help="The name of the nubia program we want " "to generate a completer for",
     )
     generate_parser.add_argument(
         "--command-model-path",
@@ -63,9 +62,7 @@ def main(args):
     log_level = logging.getLevelName(args.loglevel)
     logging.basicConfig(level=log_level)
     if args.mode == "generate-shell-setup":
-        return generate_shell_setup(
-            args.target_binary_name, args.command_model_path
-        )
+        return generate_shell_setup(args.target_binary_name, args.command_model_path)
     elif args.mode == "complete":
         return run_complete(args)
     else:
@@ -74,4 +71,4 @@ def main(args):
 
 
 if __name__ == "__main__":
-    sys.exit(main(sys.argv))
+    run()
