@@ -55,7 +55,7 @@ setuptools.setup(
     packages=setuptools.find_packages(exclude=["sample", "docs", "tests"]),
     python_requires=">=3.6",
     setup_requires=["nose>=1.0", "coverage"],
-    tests_require=["nose>=1.0"],
+    tests_require=["nose>=1.0", "dataclasses;python_version<'3.7'"],
     install_requires=reqs,
     classifiers=(
         "Development Status :: 4 - Beta",
