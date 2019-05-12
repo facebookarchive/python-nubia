@@ -8,30 +8,28 @@
 #
 
 import argparse
+import copy
 import os
 import shutil
 import subprocess
-import copy
 import sys
-
-from collections import Iterable, Mapping, defaultdict
+from collections import defaultdict
 from functools import partial
+from typing import Any, Dict, List, Tuple  # noqa F401
 
 from nubia.internal.typing.builder import (
     build_value,
     get_dict_kv_arg_type_as_str,
     get_list_arg_type_as_str,
 )
-
-from nubia.internal.helpers import (
-    is_optional,
-    issubclass_,
-    get_first_type_variable,
+from nubia.internal.typing.inspect import (
+    get_first_type_argument,
+    is_iterable_type,
+    is_mapping_type,
+    is_optional_type,
 )
 
 from . import command, inspect_object, transform_name
-
-from typing import Any, Tuple, List, Dict  # noqa F401
 
 
 def create_subparser_class(opts_parser):
@@ -198,8 +196,8 @@ def _argument_to_argparse_input(arg):
 
     argument_type = (
         arg.type
-        if not is_optional(arg.type)
-        else get_first_type_variable(arg.type)
+        if not is_optional_type(arg.type)
+        else get_first_type_argument(arg.type)
     )
     if argument_type in [int, float, str]:
         add_argument_kwargs["type"] = argument_type
@@ -208,13 +206,13 @@ def _argument_to_argparse_input(arg):
         add_argument_kwargs["action"] = "store_true"
     elif arg.default_value is True:
         add_argument_kwargs["action"] = "store_false"
-    elif issubclass_(argument_type, Mapping):
+    elif is_mapping_type(argument_type):
         add_argument_kwargs["type"] = _parse_dict(argument_type)
         add_argument_kwargs["metavar"] = "DICT[{}: {}]".format(
             *get_dict_kv_arg_type_as_str(argument_type)
         )
-    elif issubclass_(argument_type, Iterable):
-        add_argument_kwargs["type"] = get_first_type_variable(argument_type)
+    elif is_iterable_type(argument_type):
+        add_argument_kwargs["type"] = get_first_type_argument(argument_type)
         add_argument_kwargs["nargs"] = "+"
         add_argument_kwargs["metavar"] = "{}".format(
             get_list_arg_type_as_str(argument_type)

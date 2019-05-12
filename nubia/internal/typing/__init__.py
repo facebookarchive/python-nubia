@@ -59,10 +59,10 @@ following example achieves the exact same result as the example above:
         ...
 """
 
-import inspect
 
 from collections import namedtuple, Container, OrderedDict
 from functools import partial
+from inspect import ismethod, isclass
 
 from nubia.internal.helpers import (
     get_arg_spec,
@@ -168,7 +168,7 @@ def argument(
             raise ValueError(msg)
 
         # reject positional=True if we are applied over a class
-        if inspect.isclass(function) and positional:
+        if isclass(function) and positional:
             raise ValueError(
                 "Cannot set positional arguments for super " "commands"
             )
@@ -202,7 +202,7 @@ def command(
     """
 
     def decorator(function, name=None):
-        is_class = inspect.isclass(name_or_function)
+        is_supercommand = isclass(name_or_function)
         exclusive_arguments_ = _normalize_exclusive_arguments(
             exclusive_arguments
         )
@@ -214,7 +214,7 @@ def command(
         else:
             function.__command["name"] = (
                 transform_name(function.__name__)
-                if not is_class
+                if not is_supercommand
                 else transform_class_name(function.__name__)
             )
         function.__command["help"] = help
@@ -249,7 +249,7 @@ def inspect_object(obj, accept_bound_methods=False):
     args = argspec.args
     # remove the first argument in case this is a method (normally the first
     # arg is 'self')
-    if inspect.ismethod(obj):
+    if ismethod(obj):
         args = args[1:]
 
     result = {"arguments": OrderedDict(), "command": None, "subcommands": {}}
@@ -263,10 +263,10 @@ def inspect_object(obj, accept_bound_methods=False):
         )
 
     # Is this a super command?
-    is_class = inspect.isclass(obj)
+    is_supercommand = isclass(obj)
 
     for i, arg in enumerate(args):
-        if (is_class or accept_bound_methods) and arg == "self":
+        if (is_supercommand or accept_bound_methods) and arg == "self":
             continue
         arg_idx_with_default = len(args) - len(argspec.defaults)
         default_value_set = bool(argspec.defaults and i >= arg_idx_with_default)
@@ -277,7 +277,7 @@ def inspect_object(obj, accept_bound_methods=False):
         )
         # We will reject classes (super-commands) that has required arguments to
         # reduce complexity
-        if is_class and not default_value_set:
+        if is_supercommand and not default_value_set:
             raise ValueError(
                 "Cannot accept super commands that has required "
                 "arguments with no default value "
@@ -320,7 +320,7 @@ def inspect_object(obj, accept_bound_methods=False):
                 )
 
     # Super Command Support
-    if is_class:
+    if is_supercommand:
         result["subcommands"] = []
         for attr in dir(obj):
             if attr.startswith("_"):  # ignore "private" methods

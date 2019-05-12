@@ -10,12 +10,8 @@
 import unittest
 from typing import Dict, List, Optional, Union
 
-from nubia.internal.helpers import (
-    catchall,
-    function_to_str,
-    is_optional,
-    is_union,
-)
+from nubia.internal.helpers import catchall, function_to_str
+from nubia.internal.typing.inspect import is_optional_type
 
 
 class HelpersTest(unittest.TestCase):
@@ -48,14 +44,9 @@ class HelpersTest(unittest.TestCase):
         self.assertRaises(KeyboardInterrupt, catchall, raise_keyboard_interrupt)
         self.assertRaises(SystemExit, catchall, raise_sysexit)
 
-    def test_is_union(self):
-        self.assertTrue(is_union(Union[str, int]))
-        self.assertFalse(is_union(List[str]))
-        self.assertFalse(is_union(Dict[str, int]))
-
     def test_is_optional(self):
-        self.assertFalse(is_optional(List[str]))
-        self.assertFalse(is_optional(Dict[str, int]))
-        self.assertFalse(is_optional(Union[str, int]))
-        self.assertTrue(is_optional(Optional[str]))
-        self.assertTrue(is_optional(Union[str, None]))
+        self.assertFalse(is_optional_type(List[str]))
+        self.assertFalse(is_optional_type(Dict[str, int]))
+        self.assertFalse(is_optional_type(Union[str, int]))
+        self.assertTrue(is_optional_type(Optional[str]))
+        self.assertTrue(is_optional_type(Union[str, None]))

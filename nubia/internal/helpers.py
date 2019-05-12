@@ -14,7 +14,6 @@ import string
 import subprocess
 
 from collections import namedtuple
-from typing import _Union, Any, Iterable  # noqa T484
 
 
 def add_command_arguments(parser, options):
@@ -163,41 +162,6 @@ def issubclass_(obj, class_):
         return issubclass(obj, class_)
     except (AttributeError, TypeError):
         return False
-
-
-def is_union(t: Any) -> bool:
-    """Check whether type is a Union.
-
-    @param t: type to check
-    @type: Any
-    @returns: `True` if type is a Union, `False` otherwise
-    @rtype: bool
-
-    @note: This is a hack. See https://bugs.python.org/issue29262 and
-    https://github.com/ilevkivskyi/typing_inspect for the rationale behind the
-    implementation.
-    """
-    return type(t) is _Union
-
-
-def is_optional(t: Any) -> bool:
-    """Check whether a type is an Optional.
-
-    @note: This is a hack.
-    """
-    if not is_union(t):
-        return False
-    elif len(t.__args__) > 2:  # `Optional` is a `Union` of 2 values
-        return False
-    else:
-        _, right = t.__args__
-        return right is type(None)  # noqa E721
-
-
-def get_first_type_variable(t: Any) -> Any:
-    """Given an List[T], return T."""
-    assert hasattr(t, "__args__") and len(t.__args__) > 0
-    return t.__args__[0]
 
 
 def catchall(func, *args):
