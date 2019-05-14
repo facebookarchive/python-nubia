@@ -46,6 +46,7 @@ def start_interactive_python(plugin, registry, ctx, args):
     cfg.TerminalInteractiveShell.prompts_class = CustomPrompt
     # Custom Config
     cfg.InteractiveShellEmbed.autocall = 2
+    cfg.InteractiveShellEmbed.autoawait = True
 
     banner = "LogDevice IPython Shell;  Python {}".format(sys.version)
 
