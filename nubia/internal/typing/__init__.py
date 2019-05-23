@@ -60,7 +60,8 @@ following example achieves the exact same result as the example above:
 """
 
 
-from collections import namedtuple, Container, OrderedDict
+from collections import namedtuple, OrderedDict
+from collections.abc import Container
 from functools import partial
 from inspect import ismethod, isclass
 
