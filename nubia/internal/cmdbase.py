@@ -169,7 +169,7 @@ class AutoCommand(Command):
                 _sub_name = inspection.command.name
                 self._commands_completer.words.append(_sub_name)
                 self._commands_completer.meta_dict[_sub_name] = dedent(
-                    inspection.command.help
+                    inspection.command.help or ""
                 ).strip()
                 self._subcommand_names.append(_sub_name)
 
