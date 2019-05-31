@@ -13,7 +13,7 @@ from typing import List, Optional
 from termcolor import cprint
 
 from nubia import argument, command, deprecated
-from util import TestShell
+from tests.util import TestShell
 
 
 class CommandSpecTest(unittest.TestCase):
@@ -29,15 +29,9 @@ class CommandSpecTest(unittest.TestCase):
             return 22
 
         shell = TestShell(commands=[test_command])
-        self.assertEqual(
-            22, shell.run_cli_line("test_shell test-command --arg a b")
-        )
-        self.assertEqual(
-            22, shell.run_interactive_line('test-command arg=["a","b"]')
-        )
-        self.assertEqual(
-            22, shell.run_interactive_line("test-command arg=[a, b]")
-        )
+        self.assertEqual(22, shell.run_cli_line("test_shell test-command --arg a b"))
+        self.assertEqual(22, shell.run_interactive_line('test-command arg=["a","b"]'))
+        self.assertEqual(22, shell.run_interactive_line("test-command arg=[a, b]"))
 
     def test_command_name_spec2(self):
         """
@@ -56,15 +50,9 @@ class CommandSpecTest(unittest.TestCase):
             return 22
 
         shell = TestShell(commands=[test_command])
-        self.assertEqual(
-            22, shell.run_cli_line("test_shell bleh_command --arg a b")
-        )
-        self.assertEqual(
-            22, shell.run_interactive_line('bleh_command arg=["a","b"]')
-        )
-        self.assertEqual(
-            22, shell.run_interactive_line("bleh_command arg=[a, b]")
-        )
+        self.assertEqual(22, shell.run_cli_line("test_shell bleh_command --arg a b"))
+        self.assertEqual(22, shell.run_interactive_line('bleh_command arg=["a","b"]'))
+        self.assertEqual(22, shell.run_interactive_line("bleh_command arg=[a, b]"))
 
     def test_no_type_works_the_same(self):
         @command
@@ -93,9 +81,7 @@ class CommandSpecTest(unittest.TestCase):
             return 64 + int(arg)
 
         shell = TestShell(commands=[test_command])
-        self.assertEqual(
-            65, shell.run_cli_line("test_shell test-command --arg 1")
-        )
+        self.assertEqual(65, shell.run_cli_line("test_shell test-command --arg 1"))
         self.assertEqual(65, shell.run_interactive_line("test-command arg=1"))
         self.assertEqual(65, shell.run_interactive_line('test-command arg="1"'))
 
@@ -117,12 +103,8 @@ class CommandSpecTest(unittest.TestCase):
             return 64 * int(arg1) + int(arg2)
 
         shell = TestShell(commands=[test_command])
-        self.assertEqual(
-            66, shell.run_cli_line("test_shell test-command 1 2 nubia")
-        )
-        self.assertEqual(
-            66, shell.run_interactive_line("test-command 1 2 nubia")
-        )
+        self.assertEqual(66, shell.run_cli_line("test_shell test-command 1 2 nubia"))
+        self.assertEqual(66, shell.run_interactive_line("test-command 1 2 nubia"))
 
     def test_command_with_postional_and_named_arguments(self):
         @command
@@ -144,16 +126,12 @@ class CommandSpecTest(unittest.TestCase):
         self.assertEqual(
             66, shell.run_cli_line("test_shell test-command --arg1=1 2 nubia")
         )
-        self.assertEqual(
-            66, shell.run_interactive_line("test-command arg1=1 2 nubia")
-        )
+        self.assertEqual(66, shell.run_interactive_line("test-command arg1=1 2 nubia"))
         self.assertEqual(
             66, shell.run_interactive_line("test-command arg1=1 arg2=2 nubia")
         )
         # Fails parsing because positionals have to be at the end
-        self.assertEqual(
-            1, shell.run_interactive_line("test-command 2 nubia arg1=1")
-        )
+        self.assertEqual(1, shell.run_interactive_line("test-command 2 nubia arg1=1"))
 
     def test_command_with_mutex_groups(self):
         @command(exclusive_arguments=["arg1", "arg2"])
@@ -166,14 +144,10 @@ class CommandSpecTest(unittest.TestCase):
             return 64 * int(arg1) + int(arg2)
 
         shell = TestShell(commands=[test_command])
-        self.assertEqual(
-            64, shell.run_cli_line("test_shell test-command --arg1 1")
-        )
+        self.assertEqual(64, shell.run_cli_line("test_shell test-command --arg1 1"))
         self.assertEqual(64, shell.run_interactive_line("test-command arg1=1"))
 
-        self.assertEqual(
-            2, shell.run_cli_line("test_shell test-command --arg2 2")
-        )
+        self.assertEqual(2, shell.run_cli_line("test_shell test-command --arg2 2"))
         self.assertEqual(2, shell.run_interactive_line("test-command arg2=2"))
 
         with self.assertRaises(SystemExit):
@@ -238,9 +212,7 @@ class CommandSpecTest(unittest.TestCase):
         shell = TestShell(commands=[test_command])
         self.assertEqual(42, shell.run_cli_line("test_shell test-command"))
         self.assertEqual(42, shell.run_interactive_line("test-command"))
-        self.assertEqual(
-            0, shell.run_cli_line("test_shell test-command --arg 0")
-        )
+        self.assertEqual(0, shell.run_cli_line("test_shell test-command --arg 0"))
         self.assertEqual(0, shell.run_interactive_line("test-command arg=[0]"))
 
     def test_command_one_required_one_default_argument(self):
@@ -261,9 +233,7 @@ class CommandSpecTest(unittest.TestCase):
             return arg1 + arg2
 
         shell = TestShell(commands=[test_command])
-        self.assertEqual(
-            22, shell.run_cli_line("test_shell bleh_command --arg1=21")
-        )
+        self.assertEqual(22, shell.run_cli_line("test_shell bleh_command --arg1=21"))
         self.assertEqual(22, shell.run_interactive_line("bleh_command arg1=21"))
 
     def test_command_for_blacklist_plugin_allowed(self):
@@ -304,13 +274,9 @@ class CommandSpecTest(unittest.TestCase):
 
         shell = TestShell(commands=[test_command])
         # Cli run
-        self.assertEqual(
-            42, shell.run_cli_line("test_shell minus_command --arg1=-1")
-        )
+        self.assertEqual(42, shell.run_cli_line("test_shell minus_command --arg1=-1"))
         # Interactive
-        self.assertEqual(
-            42, shell.run_interactive_line("minus_command arg1=-1")
-        )
+        self.assertEqual(42, shell.run_interactive_line("minus_command arg1=-1"))
 
     def test_command_with_negative_floats(self):
         @command("minus_command")
@@ -324,19 +290,11 @@ class CommandSpecTest(unittest.TestCase):
 
         shell = TestShell(commands=[test_command])
         # Cli run
-        self.assertEqual(
-            42, shell.run_cli_line("test_shell minus_command --arg1=-1")
-        )
-        self.assertEqual(
-            42, shell.run_cli_line("test_shell minus_command --arg1=-1.0")
-        )
+        self.assertEqual(42, shell.run_cli_line("test_shell minus_command --arg1=-1"))
+        self.assertEqual(42, shell.run_cli_line("test_shell minus_command --arg1=-1.0"))
         # Interactive
-        self.assertEqual(
-            42, shell.run_interactive_line("minus_command arg1=-1")
-        )
-        self.assertEqual(
-            42, shell.run_interactive_line("minus_command arg1=-1.0")
-        )
+        self.assertEqual(42, shell.run_interactive_line("minus_command arg1=-1"))
+        self.assertEqual(42, shell.run_interactive_line("minus_command arg1=-1.0"))
 
     def test_command_deprecation(self):
         @deprecated(superseded_by="new-command")
@@ -373,19 +331,13 @@ class CommandSpecTest(unittest.TestCase):
 
         shell = TestShell(commands=[test_command])
         # CLI
-        self.assertEqual(
-            "a", shell.run_cli_line("test_shell test-command --args a")
-        )
+        self.assertEqual("a", shell.run_cli_line("test_shell test-command --args a"))
         self.assertEqual(
             "a|b", shell.run_cli_line("test_shell test-command --args a b")
         )
         # Interactive
-        self.assertEqual(
-            "a", shell.run_interactive_line('test-command args="a"')
-        )
-        self.assertEqual(
-            "a", shell.run_interactive_line('test-command args=["a"]')
-        )
+        self.assertEqual("a", shell.run_interactive_line('test-command args="a"'))
+        self.assertEqual("a", shell.run_interactive_line('test-command args=["a"]'))
         self.assertEqual(
             "a|b", shell.run_interactive_line('test-command args=["a", "b"]')
         )

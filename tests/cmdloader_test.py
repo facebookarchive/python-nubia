@@ -27,6 +27,7 @@ class CommandLoaderTest(unittest.TestCase):
         self.assertEquals(3, len(loaded))
         from tests.sample_package import commands
         from tests.sample_package.subpackage import more_commands
+
         self.assertTrue(commands.example_command1 in loaded)
         self.assertTrue(more_commands.example_command2 in loaded)
         self.assertTrue(more_commands.SuperCommand in loaded)

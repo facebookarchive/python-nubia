@@ -23,9 +23,9 @@ class InspectionTest(unittest.TestCase):
         data = inspect_object(my_function)
         cmd = data.command
         args = data.arguments
-        self.assertEquals("my-function", cmd.name)
-        self.assertEquals("HelpMessage", cmd.help)
-        self.assertEquals(2, len(args))
+        self.assertEqual("my-function", cmd.name)
+        self.assertEqual("HelpMessage", cmd.help)
+        self.assertEqual(2, len(args))
         self.assertTrue("arg1" in args.keys())
         self.assertTrue("argument-2" in args.keys())
 
@@ -42,16 +42,16 @@ class InspectionTest(unittest.TestCase):
         data = inspect_object(SuperCommand)
         cmd = data.command
         args = data.arguments
-        self.assertEquals("super-command", cmd.name)
-        self.assertEquals("SuperHelp", cmd.help)
-        self.assertEquals(0, len(args.keys()))
-        self.assertEquals(1, len(data.subcommands))
+        self.assertEqual("super-command", cmd.name)
+        self.assertEqual("SuperHelp", cmd.help)
+        self.assertEqual(0, len(args.keys()))
+        self.assertEqual(1, len(data.subcommands))
         subcmd_attr, subcmd_insp = data.subcommands[0]
-        self.assertEquals("my_function", subcmd_attr)
+        self.assertEqual("my_function", subcmd_attr)
         subcmd = subcmd_insp.command
-        self.assertEquals("my-function", subcmd.name)
-        self.assertEquals("HelpMessage", subcmd.help)
+        self.assertEqual("my-function", subcmd.name)
+        self.assertEqual("HelpMessage", subcmd.help)
         subargs = subcmd_insp.arguments
-        self.assertEquals(2, len(subargs))
+        self.assertEqual(2, len(subargs))
         self.assertTrue("arg1" in subargs.keys())
         self.assertTrue("argument-2" in subargs.keys())
