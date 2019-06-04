@@ -21,17 +21,6 @@ from nubia.internal.typing import argument, inspect_object
 
 
 class DecoratorTest(unittest.TestCase):
-    def test_equality_no_decorator(self):
-        def foo(arg1: typing.Any, arg2: str) -> typing.Tuple[str, str]:
-            return (arg1, arg2)
-
-        @argument("arg1", type=typing.Any)
-        @argument("arg2", type=str)
-        def bar(arg1, arg2):
-            return (arg1, arg2)
-
-        self.assertEquals(inspect_object(foo), inspect_object(bar))
-
     def test_equality_decorated(self):
         @argument("arg1", description="arg1 desc")
         @argument("arg2", description="arg2 desc")
@@ -43,7 +32,7 @@ class DecoratorTest(unittest.TestCase):
         def bar(arg1, arg2):
             return (arg1, arg2)
 
-        self.assertEquals(inspect_object(foo), inspect_object(bar))
+        self.assertEqual(inspect_object(foo), inspect_object(bar))
 
     def test_inequality_no_decorator(self):
         def foo(arg1: str, arg2: str) -> typing.Tuple[str, str]:
@@ -52,7 +41,7 @@ class DecoratorTest(unittest.TestCase):
         def bar(arg1, arg2):
             return (arg1, arg2)
 
-        self.assertNotEquals(inspect_object(foo), inspect_object(bar))
+        self.assertNotEqual(inspect_object(foo), inspect_object(bar))
 
     def test_inequality_decorated(self):
         def foo(arg1: str, arg2: str) -> typing.Tuple[str, str]:
@@ -63,7 +52,7 @@ class DecoratorTest(unittest.TestCase):
         def bar(arg1, arg2):
             return (arg1, arg2)
 
-        self.assertNotEquals(inspect_object(foo), inspect_object(bar))
+        self.assertNotEqual(inspect_object(foo), inspect_object(bar))
 
     def test_type_conflict(self):
 

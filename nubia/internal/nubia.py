@@ -15,6 +15,7 @@ import os
 import sys
 import tempfile
 import traceback
+import typing
 from termcolor import cprint
 
 from nubia.internal import context
@@ -22,6 +23,8 @@ from nubia.internal import exceptions
 from nubia.internal.options import Options
 from nubia.internal.typing.argparse import create_subparser_class
 from nubia.internal.blackcmd import CommandBlacklist
+from nubia.internal.cmdbase import AutoCommand
+from nubia.internal import cmdloader
 from nubia.internal.commands import builtin
 from nubia.internal.commands import help
 from nubia.internal.helpers import catchall
@@ -72,12 +75,20 @@ class Nubia(object):
     plugin it will load on startup.
     """
 
-    def __init__(self, name, plugin=None, testing=False, options: Options = None):
+    def __init__(
+        self,
+        name,
+        command_pkgs=None,
+        plugin: typing.Optional[PluginInterface] = None,
+        testing: bool = False,
+        options: typing.Optional[Options] = None,
+    ):
         self._name = name
         self._plugin = plugin or PluginInterface()
         self._options = options or Options()
         assert isinstance(self._plugin, PluginInterface)
         self._blacklist = self._plugin.getBlacklistPlugin()
+        self._command_pkgs = command_pkgs
         if self._blacklist is not None:
             assert isinstance(self._blacklist, CommandBlacklist)
 
@@ -125,6 +136,12 @@ class Nubia(object):
         # load commands from plugin
         for cmd in self._plugin.get_commands():
             self._registry.register_command(cmd, override=True)
+        # load commands from command packages
+        if not isinstance(self._command_pkgs, list):
+            self._command_pkgs = [self._command_pkgs]
+        for pkg in self._command_pkgs:
+            for cmd in cmdloader.load_commands(pkg):
+                self._registry.register_command(AutoCommand(cmd), override=True)
 
         # By default, if we didn't receive any command we will use the connect
         # command which drops us to an interactive mode.
