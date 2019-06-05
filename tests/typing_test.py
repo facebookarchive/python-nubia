@@ -69,10 +69,14 @@ class SimpleValuesBuilderTest(unittest.TestCase):
         self.assertEqual(value, ["special", "string"])
 
     def test_build_tuple(self):
-        value = build_value("foo bar,1,0.5", typing.Tuple[str, int, float], False)
+        value = build_value(
+            "foo bar,1,0.5", typing.Tuple[str, int, float], False
+        )
         self.assertEqual(value, ("foo bar", 1, 0.5))
 
-        value = build_value('("foo bar",1,0.5)', typing.Tuple[str, int, float], True)
+        value = build_value(
+            '("foo bar",1,0.5)', typing.Tuple[str, int, float], True
+        )
         self.assertEqual(value, ("foo bar", 1, 0.5))
 
     def test_build_tuple_partially_typed(self):
@@ -120,7 +124,9 @@ class SimpleValuesBuilderTest(unittest.TestCase):
         value = build_value("a=1,2,3;b=2", typing.Mapping[str, str], False)
         self.assertEqual(value, {"a": "1,2,3", "b": "2"})
 
-        value = build_value("a=1,2,3;b=2", typing.Mapping[str, typing.List[int]], False)
+        value = build_value(
+            "a=1,2,3;b=2", typing.Mapping[str, typing.List[int]], False
+        )
         self.assertEqual(value, {"a": [1, 2, 3], "b": [2]})
 
     def test_build_partially_typed_dict(self):
@@ -170,7 +176,9 @@ class SimpleValuesBuilderTest(unittest.TestCase):
         value = build_value(" a : 1 ; b : 2 ", typing.Mapping[str, int], False)
         self.assertEqual(value, {"a": 1, "b": 2})
 
-        value = build_value('{ "a" : 1 , "b" : 2 }', typing.Mapping[str, int], True)
+        value = build_value(
+            '{ "a" : 1 , "b" : 2 }', typing.Mapping[str, int], True
+        )
         self.assertEqual(value, {"a": 1, "b": 2})
 
         value = build_value(" 1 , 2 , 3 ", typing.List[int], False)
@@ -236,11 +244,19 @@ class SimpleValuesBuilderTest(unittest.TestCase):
 
         # too few arguments
         self.assertRaises(
-            ValueError, build_value, "foo bar", typing.Tuple[str, int, float], False
+            ValueError,
+            build_value,
+            "foo bar",
+            typing.Tuple[str, int, float],
+            False,
         )
 
         self.assertRaises(
-            ValueError, build_value, '("foo bar",)', typing.Tuple[str, int, float], True
+            ValueError,
+            build_value,
+            '("foo bar",)',
+            typing.Tuple[str, int, float],
+            True,
         )
 
 
@@ -308,9 +324,15 @@ class ArgparseExtensionTest(unittest.TestCase):
         def foo3(arg1, arg2):
             return "{} {}".format(arg1, arg2)
 
-        self._test(foo, "foo --banana Hello --apple World".split(), "Hello World")
-        self._test(foo2, "foo2 --banana Hello --arg2 World".split(), "Hello World")
-        self._test(foo3, "foo3 --banana Hello --arg2 World".split(), "Hello World")
+        self._test(
+            foo, "foo --banana Hello --apple World".split(), "Hello World"
+        )
+        self._test(
+            foo2, "foo2 --banana Hello --arg2 World".split(), "Hello World"
+        )
+        self._test(
+            foo3, "foo3 --banana Hello --arg2 World".split(), "Hello World"
+        )
 
         self._test(foo, "foo --arg1 Hello --apple World".split(), ParseError)
 
@@ -333,8 +355,12 @@ class ArgparseExtensionTest(unittest.TestCase):
 
         self._test(foo, "foo --arg 6".split(), (6, {"extra_arg": None}))
         self._test(foo, "foo --extra-arg 15".split(), ParseError)
-        self._test(foo, "foo --arg 14 --another-extra-arg 15".split(), ParseError)
-        self._test(foo, "foo --arg 3 --extra-arg 15".split(), (3, {"extra_arg": 15}))
+        self._test(
+            foo, "foo --arg 14 --another-extra-arg 15".split(), ParseError
+        )
+        self._test(
+            foo, "foo --arg 3 --extra-arg 15".split(), (3, {"extra_arg": 15})
+        )
 
     def test_argument_decorated_naming_conventions(self):
         @argument("arg_1", aliases=["_argument__1"])
@@ -342,8 +368,12 @@ class ArgparseExtensionTest(unittest.TestCase):
         def __foo__bar__(arg_1, arg_2):
             return "{} {}".format(arg_1, arg_2)
 
-        self._test(__foo__bar__, "foo-bar --arg-1 x --argument-2 y".split(), "x y")
-        self._test(__foo__bar__, "foo-bar --argument-1 x --argument-2 y".split(), "x y")
+        self._test(
+            __foo__bar__, "foo-bar --arg-1 x --argument-2 y".split(), "x y"
+        )
+        self._test(
+            __foo__bar__, "foo-bar --argument-1 x --argument-2 y".split(), "x y"
+        )
 
     def test_argument_dict_list_type_lifting(self):
         @argument("arg_1", type=typing.Mapping[str, int])
@@ -351,9 +381,13 @@ class ArgparseExtensionTest(unittest.TestCase):
         def __foo__bar__(arg_1, arg_2):
             return (arg_1, arg_2)
 
-        self._test(__foo__bar__, "foo-bar --arg-1 x --arg-2 y".split(), ParseError)
+        self._test(
+            __foo__bar__, "foo-bar --arg-1 x --arg-2 y".split(), ParseError
+        )
 
-        self._test(__foo__bar__, "foo-bar --arg-1 1 --arg-2 2".split(), ParseError)
+        self._test(
+            __foo__bar__, "foo-bar --arg-1 1 --arg-2 2".split(), ParseError
+        )
         self._test(
             __foo__bar__,
             "foo-bar --arg-1 allData=1 --arg-2 2".split(),
@@ -387,7 +421,9 @@ class ArgparseExtensionTest(unittest.TestCase):
 
         self._test(__foo__bar__, "foo-bar --arg-1 x".split(), ParseError)
 
-        self._test(__foo__bar__, "foo-bar --arg-1 allData=1".split(), {"allData": [1]})
+        self._test(
+            __foo__bar__, "foo-bar --arg-1 allData=1".split(), {"allData": [1]}
+        )
         self._test(
             __foo__bar__,
             "foo-bar --arg-1 all=1;nothing-data:2".split(),
@@ -453,7 +489,9 @@ class ArgparseExtensionTest(unittest.TestCase):
         self._test(foo, "foo --arg2=bar --arg3=bar".split(), ",bar,bar")
 
         self._test(foo, "foo --arg1=bar --arg2=bar".split(), ParseError)
-        self._test(foo, "foo --arg1=bar --arg2=bar --arg3=bar".split(), ParseError)
+        self._test(
+            foo, "foo --arg1=bar --arg2=bar --arg3=bar".split(), ParseError
+        )
 
     def test_command_exclusive_args_array(self):
         @command(exclusive_arguments=[["arg1", "arg2"], ["arg3", "arg4"]])
@@ -472,7 +510,9 @@ class ArgparseExtensionTest(unittest.TestCase):
         self._test(foo, "foo --arg1=bar --arg2=bar".split(), ParseError)
         self._test(foo, "foo --arg3=bar --arg4=bar".split(), ParseError)
         self._test(
-            foo, "foo --arg1=bar --arg2=bar --arg3=bar --arg4=bar".split(), ParseError
+            foo,
+            "foo --arg1=bar --arg2=bar --arg3=bar --arg4=bar".split(),
+            ParseError,
         )
 
     def test_command_repeated_exclusive_args(self):

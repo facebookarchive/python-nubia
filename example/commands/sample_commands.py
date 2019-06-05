@@ -94,7 +94,7 @@ class SuperCommand:
         """
         cprint("My name is: {}".format(firstname))
 
-    @command(aliases=["do"])
+    @command
     def do_stuff(self, stuff: int):
         """
         doing stuff

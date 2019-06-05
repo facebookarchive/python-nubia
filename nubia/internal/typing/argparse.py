@@ -99,9 +99,7 @@ def register_command(argparse_parser, inspection):
     # auto wrap the function with @command in case its not wrapped into one
     subparsers = _resolve_subparsers(argparse_parser)
 
-    subparser = subparsers.add_parser(
-        _command.name, aliases=_command.aliases, help=_command.help
-    )
+    subparser = subparsers.add_parser(_command.name, help=_command.help)
 
     # Exclusive arguments needs to be added to argparse's mutually exclusive
     # groups

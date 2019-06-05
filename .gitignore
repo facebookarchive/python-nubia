@@ -9,4 +9,3 @@ dist
 .venv*
 .eggs
 .coverage
-.ycm_extra_conf.py
