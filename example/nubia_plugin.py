@@ -8,12 +8,10 @@
 #
 
 import argparse
-from commands import sample_commands
 from nubia_context import NubiaExampleContext
 from nubia_statusbar import NubiaExampleStatusBar
 from nubia import PluginInterface, CompletionDataSource
 from nubia.internal.blackcmd import CommandBlacklist
-from nubia.internal.cmdbase import AutoCommand
 
 
 class NubiaExamplePlugin(PluginInterface):
@@ -40,16 +38,6 @@ class NubiaExamplePlugin(PluginInterface):
         the error message.
         """
         pass
-
-    def get_commands(self):
-        return [
-            AutoCommand(sample_commands.lookup_hosts),
-            AutoCommand(sample_commands.bad_name),
-            AutoCommand(sample_commands.triple),
-            AutoCommand(sample_commands.be_blocked),
-            AutoCommand(sample_commands.pick),
-            AutoCommand(sample_commands.SuperCommand),
-        ]
 
     def get_opts_parser(self, add_help=True):
         """

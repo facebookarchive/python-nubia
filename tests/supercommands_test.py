@@ -10,7 +10,7 @@
 import unittest
 
 from nubia import command
-from util import TestShell
+from tests.util import TestShell
 
 
 class SuperCommandSpecTest(unittest.TestCase):

@@ -30,9 +30,7 @@ class TestPlugin(PluginInterface):
 
 class TestShell(Nubia):
     def __init__(self, commands, name="test_shell"):
-        super(TestShell, self).__init__(
-            name, plugin=TestPlugin(commands), testing=True
-        )
+        super(TestShell, self).__init__(name, plugin=TestPlugin(commands), testing=True)
         self.registry = self._registry
 
     def run_cli_line(self, raw_line):

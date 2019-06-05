@@ -407,7 +407,7 @@ class AutoCommand(Command):
         assert self.super_command
         subcommands = self.metadata.subcommands
         for attr, inspection in subcommands:
-            if inspection.command.name == name:
+            if inspection.command.name == name or name in inspection.command.aliases:
                 return attr
         # be explicit about returning None for readability
         return None
