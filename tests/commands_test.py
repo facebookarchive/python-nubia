@@ -53,6 +53,24 @@ class CommandSpecTest(unittest.TestCase):
         self.assertEqual(22, shell.run_cli_line("test_shell bleh_command --arg a b"))
         self.assertEqual(22, shell.run_interactive_line('bleh_command arg=["a","b"]'))
         self.assertEqual(22, shell.run_interactive_line("bleh_command arg=[a, b]"))
+        
+    def test_command_aliases_spec(self):
+        """
+        Testing aliases
+        """
+
+        @command("bleh_command", aliases=["bleh"])
+        @argument("arg", description="argument help", aliases=["i"])
+        def test_command(arg: List[str]) -> int:
+            """
+            Sample Docstring
+            """
+            self.assertEqual(["a", "b"], arg)
+            cprint(arg, "green")
+            return 22
+
+        shell = TestShell(commands=[test_command])
+        self.assertEqual(22, shell.run_cli_line("test_shell bleh -i a b"))
 
     def test_no_type_works_the_same(self):
         @command
