@@ -17,7 +17,7 @@ from prompt_toolkit.completion import WordCompleter
 from termcolor import cprint
 
 
-class CommandsRegistry(object):
+class CommandsRegistry:
     """
     A registry that holds all commands implementations and creates a quick
     access point for resolving a command string into the corresponding handling

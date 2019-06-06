@@ -13,11 +13,11 @@ import traceback
 logger = logging.getLogger(__name__)
 
 
-class Message(object):
+class Message:
     CONNECTED = 1
 
 
-class Listener(object):
+class Listener:
     def react(self, msg, *args, **kwargs):
         if msg == Message.CONNECTED:
             try:

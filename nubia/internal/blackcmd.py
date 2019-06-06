@@ -8,7 +8,7 @@
 #
 
 
-class CommandBlacklist(object):
+class CommandBlacklist:
 
     _blacklisted_commands = {}
 

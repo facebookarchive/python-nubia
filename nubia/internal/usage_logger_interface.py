@@ -8,7 +8,7 @@
 #
 
 
-class UsageLoggerInterface(object):
+class UsageLoggerInterface:
     """
     The UsageLoggerInterface class is a way to customize nubia usage logging
     to your logging infrastructure.

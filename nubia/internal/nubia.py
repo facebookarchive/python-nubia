@@ -68,7 +68,7 @@ def set_default_subparser(self, name, args=None):
 argparse.ArgumentParser.set_default_subparser = set_default_subparser
 
 
-class Nubia(object):
+class Nubia:
     """
     This is the core class that creates and runs nubia, the constructor takes
     a number of arguments that control how nubia should behave and which

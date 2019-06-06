@@ -38,7 +38,7 @@ from nubia.internal import parser
 from textwrap import dedent
 
 
-class Command(object):
+class Command:
     """A Command is the abstraction over one or more commands that will executed
     by the shell, A Command sub-class must implement `cmds` with a dict that
     maps command to a description.
@@ -325,7 +325,7 @@ class AutoCommand(Command):
                     target_type = str
                 try:
                     new_value = apply_typing(value, target_type)
-                except ValueError as e:
+                except ValueError:
                     fn_name = function_to_str(target_type, False, False)
                     cprint(
                         'Cannot convert value "{}" to {} on argument {}'.format(

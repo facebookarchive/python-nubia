@@ -16,7 +16,7 @@ from nubia.internal.context import Context
 from nubia.internal.blackcmd import CommandBlacklist
 
 
-class CompletionDataSource(object):
+class CompletionDataSource:
     """An interface that defines completion data sources"""
 
     def get_all(self):
@@ -26,7 +26,7 @@ class CompletionDataSource(object):
         return []
 
 
-class PluginInterface(object):
+class PluginInterface:
     """
     The PluginInterface class is a way to customize nubia for every customer
     use case. It allowes custom argument validation, control over command
