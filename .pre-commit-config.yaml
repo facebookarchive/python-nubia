@@ -1,0 +1,15 @@
+repos:
+-   repo: https://gitlab.com/pycqa/flake8
+    rev: 3.7.7
+    hooks:
+    -   id: flake8
+        args: [--max-line-length=88]
+-   repo: https://github.com/python/black
+    rev: 19.3b0
+    hooks:
+    -   id: black
+default_language_version:
+    python: python3.6
+    python: python3.7
+default_stages: [commit]
+

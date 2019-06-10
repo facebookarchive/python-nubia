@@ -6,3 +6,4 @@ pyparsing>=2.2.0
 python-Levenshtein
 termcolor
 wcwidth
+pre-commit
