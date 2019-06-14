@@ -5,6 +5,9 @@ possible.
 ## Our Development Process
 External pull requests are first applied to facebook's internal branch, then synced with python-nubia github repository.
 
+## Development Requirements
+In order to develop nubia, you have to install [pre-commit](https://github.com/pre-commit/pre-commit).
+
 ## Pull Requests
 We actively welcome your pull requests.
 
