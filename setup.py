@@ -28,11 +28,6 @@ with open("requirements.txt", "r") as fd:
     reqs = [r for r in reqs if not r.strip().startswith("#")]
 
 
-with open("requirements-dev.txt", "r") as fd:
-    dreqs = fd.readlines()
-    dreqs = [r for r in dreqs if not r.strip().startswith("#")]
-
-
 def get_long_description() -> str:
     with open(path.join(here, "README.md"), "r", encoding="utf-8") as fh:
         return fh.read()
@@ -62,7 +57,7 @@ setuptools.setup(
     setup_requires=["nose>=1.0", "coverage"],
     tests_require=["nose>=1.0", "dataclasses;python_version<'3.7'"],
     entry_points={"console_scripts": ["_nubia_complete = nubia_complete.main:main"]},
-    install_requires=[reqs, dreqs],
+    install_requires=reqs,
     classifiers=(
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
