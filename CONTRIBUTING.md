@@ -7,7 +7,7 @@ External pull requests are first applied to facebook's internal branch, then syn
 
 ## Development Requirements
 The project uses [pre-commit](https://github.com/pre-commit/pre-commit) which is included in
-development dependecies `requirements-dev.txt`.
+development dependencies `requirements-dev.txt`.
 
 
 ## Pull Requests
