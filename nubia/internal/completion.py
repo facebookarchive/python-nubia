@@ -261,7 +261,13 @@ class AutoCommandCompletion:
         return []
 
     def _find_argument_by_name(self, name):
-        args_meta = self.meta.arguments.values()
+        args_meta = list(self.meta.arguments.values())
+        if self.cmd.super_command:
+            # We need to get the subcommand name
+            subcommand_name = self.doc.text.split(" ")[0]
+            for (sub_name, sub) in self.meta.subcommands:
+                if sub.command.name == subcommand_name:
+                    args_meta.extend(list(sub.arguments.values()))
         filtered = filter(lambda arg: arg.name == name, args_meta)
         return next(filtered, None)
 
