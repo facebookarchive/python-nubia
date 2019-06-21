@@ -55,3 +55,15 @@ class InspectionTest(unittest.TestCase):
         self.assertEquals(2, len(subargs))
         self.assertTrue("arg1" in subargs.keys())
         self.assertTrue("argument-2" in subargs.keys())
+
+    def test_inspect_no_docstring(self):
+        @command
+        class SuperCommand:
+            """SuperHelp"""
+
+            @command
+            def my_function(self, arg1: str):
+                pass
+
+        data = inspect_object(SuperCommand)
+        self.assertEquals(0, len(data.subcommands))

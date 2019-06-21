@@ -65,6 +65,8 @@ from collections.abc import Container
 from functools import partial
 from inspect import ismethod, isclass
 
+from termcolor import cprint
+
 from nubia.internal.helpers import (
     get_arg_spec,
     function_to_str,
@@ -330,6 +332,16 @@ def inspect_object(obj, accept_bound_methods=False):
             if not callable(candidate):  # avoid e.g. properties
                 continue
             metadata = inspect_object(candidate, accept_bound_methods=True)
+            # ignore subcommands without docstring
+            if not metadata.command.help:
+                cprint(
+                    (
+                        "[WARNING] The sub-command {} will not be loaded. "
+                        "Please provide a help message by either defining a "
+                        "docstring or filling the help argument in the "
+                        "@command annotation"
+                    ).format(metadata.command.name), "red")
+                continue
             if metadata.command:
                 result["subcommands"].append((attr, metadata))
 
