@@ -336,11 +336,12 @@ def inspect_object(obj, accept_bound_methods=False):
             if not metadata.command.help:
                 cprint(
                     (
-                        "[WARNING] The sub-command {} will not be loaded. "
+                        "[WARNING] The sub-command %s will not be loaded. " %
+                        metadata.command.name,
                         "Please provide a help message by either defining a "
                         "docstring or filling the help argument in the "
                         "@command annotation"
-                    ).format(metadata.command.name), "red")
+                    ), "red")
                 continue
             if metadata.command:
                 result["subcommands"].append((attr, metadata))

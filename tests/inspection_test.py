@@ -66,4 +66,4 @@ class InspectionTest(unittest.TestCase):
                 pass
 
         data = inspect_object(SuperCommand)
-        self.assertEquals(0, len(data.subcommands))
+        self.assertListEqual([], data.subcommands)

@@ -88,7 +88,7 @@ class SuperCommandSpecTest(unittest.TestCase):
 
             @command
             def sub_command(self, arg1: str):
-                return "Hi {}".format(arg1)
+                return "Hi %s" % arg1
 
         shell = TestShell(commands=[SuperCommand])
 
