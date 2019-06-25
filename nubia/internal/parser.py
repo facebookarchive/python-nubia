@@ -64,11 +64,11 @@ quoted_string = pp.quotedString.setParseAction(_parse_type("str"))
 # cannot have spaces
 unquoted_string = pp.Word(
     pp.alphanums + allowed_symbols_in_string
-).setParseAction(_parse_type("str)"))
+).setParseAction(_parse_type("str"))
 
 string_value = quoted_string | unquoted_string
 
-single_value = bool_value | float_value | int_value | string_value
+single_value = bool_value | float_value | string_value | int_value
 
 list_value = pp.Group(
     pp.Suppress("[")
