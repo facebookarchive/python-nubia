@@ -7,7 +7,7 @@
 # LICENSE file in the root directory of this source tree.
 #
 
-import Levenshtein
+import jellyfish
 
 from nubia.internal.cmdbase import Command
 from nubia.internal.io.eventbus import Listener
@@ -35,12 +35,6 @@ class CommandsRegistry:
 
         for lst in listeners:
             self.register_listener(lst(self))
-
-    def _make_human_suggestion(self, suggestions):
-        if len(suggestions) == 1:
-            return suggestions[0]
-        human_string = ", ".join(suggestions[:-1])
-        return human_string + " or {}".format(suggestions[-1])
 
     def register_command(self, cmd_instance, override=False):
         if not isinstance(cmd_instance, Command):
@@ -114,20 +108,25 @@ class CommandsRegistry:
     def find_command(self, cmd):
         return self._cmd_instance_map.get(cmd.lower())
 
-    def find_approx(self, cmd):
+    def find_approx(self, command) -> str:
         """Finds the closest command to the passed cmd, this is used in case we
         cannot find an exact match for the cmd
         """
-        suggestions = []
-        for c in self._cmd_instance_map.keys():
-            dist = Levenshtein.distance(str(cmd), str(c))
-            if dist <= 2:
-                suggestions.append(c)
+        def are_close_enough(this, that):
+            return jellyfish.damerau_levenshtein_distance(this, that) <= 2
+
+        suggestions = [
+            another_command
+            for another_command in self._cmd_instance_map
+            if are_close_enough(str(command), str(another_command))
+        ]
+
         if not suggestions:
             return ""
-        return " Did you mean `{}`?".format(
-            self._make_human_suggestion(suggestions)
-        )
+        elif len(suggestions) == 1:
+            return f" Did you mean {suggestions[0]}?"
+        else:
+            return f" Did you mean {', '.join(suggestions[:-1])} or {suggestions[-1]}?"
 
     def get_completions(self, document, complete_event):
         return self._completer.get_completions(document, complete_event)
