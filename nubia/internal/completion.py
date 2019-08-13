@@ -265,7 +265,7 @@ class AutoCommandCompletion:
         if self.cmd.super_command:
             # We need to get the subcommand name
             subcommand_name = self.doc.text.split(" ")[0]
-            for (sub_name, sub) in self.meta.subcommands:
+            for _, sub in self.meta.subcommands:
                 if sub.command.name == subcommand_name:
                     args_meta.extend(list(sub.arguments.values()))
         filtered = filter(lambda arg: arg.name == name, args_meta)
