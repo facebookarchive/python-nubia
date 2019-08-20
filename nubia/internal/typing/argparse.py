@@ -224,8 +224,8 @@ def _argument_to_argparse_input(arg):
 
     if arg.choices:
         add_argument_kwargs["choices"] = arg.choices
-        add_argument_kwargs["help"] += " (choose from {})".format(
-            ", ".join(map(str, arg.choices))
+        add_argument_kwargs["metavar"] = "{{{}}}".format(
+            ",".join(map(str, arg.choices))
         )
     if arg.positional and "metavar" in add_argument_kwargs:
         add_argument_kwargs["metavar"] = "{}<{}>".format(
