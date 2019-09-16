@@ -9,11 +9,11 @@
 
 import json
 import logging
-
 from argparse import _SubParsersAction
 
-from nubia.internal.typing import FunctionInspection, Command
+from nubia.internal.typing import Command, FunctionInspection
 from nubia.internal.typing.argparse import transform_argument_name
+
 
 logger = logging.getLogger(__name__)
 
@@ -31,21 +31,22 @@ def _dump_arguments(arguments):
     for arg in arguments.values():
         if arg.positional:
             output["positionals"].append(
-                {"name": transform_argument_name(arg.name), "values": arg.choices}
+                {
+                    "name": transform_argument_name(arg.name),
+                    "values": list(arg.choices) if arg.choices else None,
+                }
             )
         else:
             output["options"].append(
                 {
                     "name": transform_argument_name(arg.name),
-                    "extra_names": list(
-                        map(transform_argument_name, arg.extra_names)
-                    ),
+                    "extra_names": list(map(transform_argument_name, arg.extra_names)),
                     "expects_argument": not (
                         arg.type == bool or arg.default_value is False
                     ),
                     "default": arg.default_value,
                     "required": not arg.default_value_set,
-                    "values": arg.choices or None,
+                    "values": list(arg.choices) if arg.choices else None,
                 }
             )
     return output
@@ -80,9 +81,7 @@ def _dump_opts_parser_common(opts_parser, plugin):
         option["expects_argument"] = True if action.type is not None else False
         option_name = option.get("name")
         if option_name:
-            ds = plugin.get_completion_datasource_for_global_argument(
-                option_name
-            )
+            ds = plugin.get_completion_datasource_for_global_argument(option_name)
             if ds:
                 option["values"] = ds.get_all()
         output.append(option)
@@ -107,9 +106,7 @@ def export_registry(plugin, args, opts_parser, registry):
         if isinstance(inspection, FunctionInspection):
             commands.append(_fn_to_dict(inspection))
         else:
-            logger.warning(
-                "Command % s is not instance of " "FunctionInspection", cmd
-            )
+            logger.warning("Command %s is not instance of FunctionInspection", cmd)
 
     model = {
         "commands": commands,

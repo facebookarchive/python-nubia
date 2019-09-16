@@ -120,7 +120,7 @@ def argument(
     name=None,
     aliases=None,
     positional=False,
-    choices=False,
+    choices=None,
 ):
     """
     Annotation decorator to specify metadata for an argument
@@ -185,7 +185,7 @@ def argument(
             name=name or transform_name(arg),
             aliases=aliases or [],
             positional=positional,
-            choices=choices,
+            choices=choices or [],
         )
 
         return function
