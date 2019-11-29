@@ -61,7 +61,7 @@ class IOLoop(Listener):
         # if it does, try fit the EMACS/VI pattern using upper
         editor = getattr(
             EditingMode,
-            os.environ.get("EDITOR", EditingMode.EMACS).upper(),
+            os.environ.get("EDITOR", "EMACS").upper(),
             EditingMode.EMACS,
         )
 
