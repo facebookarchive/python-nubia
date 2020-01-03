@@ -333,14 +333,16 @@ def inspect_object(obj, accept_bound_methods=False):
                 continue
             metadata = inspect_object(candidate, accept_bound_methods=True)
             # ignore subcommands without docstring
-            if not metadata.command.help:
-                cprint((f"[WARNING] The sub-command {metadata.command.name} "
-                        "will not be loaded. "
-                        "Please provide a help message by either defining a "
-                        "docstring or filling the help argument in the "
-                        "@command annotation"), "red")
-                continue
             if metadata.command:
+                if not metadata.command.help:
+                    cprint(
+                        (f"[WARNING] The sub-command {metadata.command.name} "
+                         "will not be loaded. "
+                         "Please provide a help message by either defining a "
+                         "docstring or filling the help argument in the "
+                         "@command annotation"), "red")
+                    continue
+
                 result["subcommands"].append((attr, metadata))
 
     return FunctionInspection(**result)
