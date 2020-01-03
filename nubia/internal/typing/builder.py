@@ -16,7 +16,7 @@ from functools import wraps
 
 from nubia.internal.helpers import issubclass_
 from nubia.internal.typing.inspect import (
-    PEP_560,
+    NEW_TYPING,
     is_iterable_type,
     is_mapping_type,
     is_optional_type,
@@ -85,7 +85,7 @@ def get_typing_function(tp):
             # Unconstrained TypeVars may come from generics
             func = _identity_function
         elif len(tp.__constraints__) == 1:
-            assert not PEP_560, "Python 3.7+ forbids single constraint for `TypeVar'"
+            assert not NEW_TYPING, "Python 3.7+ forbids single constraint for `TypeVar'"
             func = get_typing_function(tp.__constraints__[0])
         else:
             raise ValueError(

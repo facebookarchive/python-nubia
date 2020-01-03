@@ -13,29 +13,27 @@ import inspect
 import sys
 import traceback
 import typing
-from typing import Iterable
 from collections import OrderedDict
+from textwrap import dedent
+from typing import Iterable
 
-from prompt_toolkit.completion import Completion, WordCompleter
-from prompt_toolkit.document import Document
-from prompt_toolkit.completion import CompleteEvent
-from termcolor import cprint
-
-from . import context
+from nubia.internal import parser
 from nubia.internal.completion import AutoCommandCompletion
 from nubia.internal.exceptions import CommandParseError
 from nubia.internal.helpers import function_to_str
-from nubia.internal.helpers import issubclass_
-from nubia.internal.typing import inspect_object, FunctionInspection
+from nubia.internal.typing import FunctionInspection, inspect_object
 from nubia.internal.typing.argparse import (
-    register_command,
     get_arguments_for_command,
     get_arguments_for_inspection,
+    register_command,
 )
 from nubia.internal.typing.builder import apply_typing
-from nubia.internal import parser
+from nubia.internal.typing.inspect import is_list_type
+from prompt_toolkit.completion import CompleteEvent, Completion, WordCompleter
+from prompt_toolkit.document import Document
+from termcolor import cprint
 
-from textwrap import dedent
+from . import context
 
 
 class Command:
@@ -344,7 +342,7 @@ class AutoCommand(Command):
                 if choices:
                     # Validate the choices in the case of values and list of
                     # values.
-                    if issubclass_(args_metadata[arg].type, typing.List):
+                    if is_list_type(args_metadata[arg].type):
                         bad_inputs = [v for v in value if v not in choices]
                         if bad_inputs:
                             cprint(
