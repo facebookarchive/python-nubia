@@ -8,12 +8,12 @@
 #
 
 import argparse
+from typing import Any, List, MutableMapping, Tuple
 
-from typing import List, Tuple, Any
-from nubia.internal.constants import DEFAULT_COMMAND_TIMEOUT
-from nubia.internal.ui import statusbar
-from nubia.internal.context import Context
 from nubia.internal.blackcmd import CommandBlacklist
+from nubia.internal.constants import DEFAULT_COMMAND_TIMEOUT
+from nubia.internal.context import Context
+from nubia.internal.ui import statusbar
 
 
 class CompletionDataSource:
@@ -141,3 +141,12 @@ class PluginInterface:
         Any return other then 0 will block command execution
         """
         return CommandBlacklist()
+
+    def update_ipython_kwargs(
+        self, ctx: Context, kwargs: MutableMapping[str, Any]
+    ) -> None:
+        """
+        Return named arguments that need to be added when calling
+        InteractiveShellEmbed.
+        """
+        pass

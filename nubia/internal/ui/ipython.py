@@ -8,20 +8,14 @@
 #
 
 from IPython.terminal.prompts import Prompts, Token
-from nubia import context
 
 
-class CustomPrompt(Prompts):
+class NubiaPrompt(Prompts):
     def in_prompt_tokens(self, cli=None):
-        target = context.get_context().target
-        target = target or "disconnected"
         return [
             (Token.Prompt, "["),
             (Token.PromptNum, str(self.shell.execution_count)),
             (Token.Prompt, "] "),
-            (Token.Prompt, "("),
-            (Token.Text, target),
-            (Token.Prompt, "): "),
         ]
 
     def out_prompt_tokens(self):

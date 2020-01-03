@@ -8,15 +8,15 @@
 #
 
 import sys
-from termcolor import colored
+
+from nubia.internal.ui.ipython import NubiaPrompt
+from traitlets.config.loader import Config
+
 
 try:
     from IPython.terminal.embed import InteractiveShellEmbed
 except ImportError:
     raise Exception("IPython is not installed, cannot use IPython-based shell")
-from traitlets.config.loader import Config
-
-from nubia.internal.ui.ipython import CustomPrompt
 
 
 custom_locals = {}
@@ -36,27 +36,23 @@ def start_interactive_python(plugin, registry, ctx, args):
                 # function names cannot have - in them
                 name = name.replace("-", "_")
                 custom_locals[name] = executable
-    if ctx.target:
-        header = "Connected to {}".format(colored(ctx.target, "green"))
-        custom_locals["tier"] = ctx.tier_ops
-    else:
-        header = "Not connected to any tiers!"
 
     cfg = Config()
-    cfg.TerminalInteractiveShell.prompts_class = CustomPrompt
+    cfg.TerminalInteractiveShell.prompts_class = NubiaPrompt
     # Custom Config
     cfg.InteractiveShellEmbed.autocall = 2
     cfg.InteractiveShellEmbed.autoawait = True
 
     banner = "LogDevice IPython Shell;  Python {}".format(sys.version)
+    ipkwargs = {
+        "config": cfg,
+        "banner1": banner,
+        "banner2": "\n",
+        "user_ns": custom_locals,
+    }
+    plugin.update_ipython_kwargs(ctx=ctx, kwargs=ipkwargs)
 
-    ipshell = InteractiveShellEmbed(
-        config=cfg,
-        banner1=banner,
-        banner2="\n",
-        header=header,
-        user_ns=custom_locals,
-    )
+    ipshell = InteractiveShellEmbed(**ipkwargs)
     for magic in plugin.get_magics():
         ipshell.register_magics(magic)
     ipshell()
