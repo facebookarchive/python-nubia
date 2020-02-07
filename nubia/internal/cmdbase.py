@@ -190,7 +190,7 @@ class AutoCommand(Command):
             for k, v in get_arguments_for_inspection(self.metadata, key_values).items()
             if v is not None
         }
-        remaining = {k: v for k, v in key_values.items() if k not in kwargs.keys()}
+        remaining = {k: v for k, v in key_values.items() if k.replace('-', '_') not in kwargs.keys()}
         return self._fn(**kwargs), remaining
 
     def run_interactive(self, cmd, args, raw):
