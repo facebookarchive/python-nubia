@@ -96,7 +96,7 @@ class IOLoop(Listener):
         if cmd not in self._command_registry:
             print()
             cprint(
-                "Unknown Command '{}',{} type :help to see all "
+                "Unknown Command '{}',{} type `help` to see all "
                 "available commands".format(
                     cmd, self._command_registry.find_approx(cmd)
                 ),
