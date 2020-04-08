@@ -124,6 +124,27 @@ class CommandSpecTest(unittest.TestCase):
         self.assertEqual(66, shell.run_cli_line("test_shell test-command 1 2 nubia"))
         self.assertEqual(66, shell.run_interactive_line("test-command 1 2 nubia"))
 
+    def test_command_with_extra_spaces(self):
+        @command
+        @argument("arg1", positional=True)
+        def test_command(arg1: str) -> None:
+            """
+            Sample Docstring
+            """
+            self.assertEqual("1", arg1)
+            self.assertIsInstance(arg1, str)
+            return True
+
+        shell = TestShell(commands=[test_command])
+        self.assertTrue(shell.run_interactive_line("test-command 1"))
+        self.assertTrue(shell.run_interactive_line("test-command  1"))
+        self.assertTrue(shell.run_interactive_line("test-command   1"))
+        self.assertTrue(shell.run_interactive_line(" test-command 1"))
+        self.assertTrue(shell.run_interactive_line("  test-command 1"))
+        self.assertTrue(shell.run_interactive_line("test-command 1 "))
+        self.assertTrue(shell.run_interactive_line("test-command 1  "))
+        self.assertTrue(shell.run_interactive_line("  test-command  1  "))
+
     def test_command_with_postional_and_named_arguments(self):
         @command
         @argument("arg2", positional=True)
