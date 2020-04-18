@@ -216,7 +216,7 @@ class Nubia:
             for command in commands:
                 # execute
                 print("> {}".format(command))
-                ret = io_loop.parse_and_evaluate(sys.stdout, command)
+                ret = io_loop.parse_and_evaluate(command)
                 # We fail execution on the first failing command
                 if ret:
                     return ret
