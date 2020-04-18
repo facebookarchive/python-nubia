@@ -32,7 +32,7 @@ from nubia.internal.ui.style import shell_style
 
 
 def split_command(text):
-    return text.split(" ", 1)
+    return text.lstrip(" ").split(" ", 1)
 
 
 class IOLoop(Listener):
