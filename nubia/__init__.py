@@ -11,6 +11,7 @@ from .internal import context
 from .internal import exceptions
 from .internal.deprecation import deprecated
 from .internal.io import eventbus
+from .internal.io.session_logger import SessionLogger
 from .internal.ui import statusbar
 from .internal.nubia import Nubia
 from .internal.options import Options
@@ -25,6 +26,7 @@ __all__ = [
     "Nubia",
     "Options",
     "PluginInterface",
+    "SessionLogger",
     "argument",
     "command",
     "context",
@@ -34,4 +36,4 @@ __all__ = [
     "statusbar",
 ]
 
-__version__ = "0.2b2"
+__version__ = "0.2b3"

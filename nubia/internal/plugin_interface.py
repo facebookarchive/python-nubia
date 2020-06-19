@@ -150,3 +150,10 @@ class PluginInterface:
         InteractiveShellEmbed.
         """
         pass
+
+    def get_session_logger(self, context):
+        """
+        Override this and return your own instance of SessionLogger if you want
+        to enable session logging.
+        """
+        return None

@@ -142,7 +142,15 @@ class IOLoop(Listener):
                             self._status_bar.get_rprompt_tokens()
                         ),
                     )
-                    self.parse_and_evaluate(text)
+                    session_logger = self._plugin.get_session_logger(self._ctx)
+                    if session_logger:
+                        # Commands don't get written to stdout, so we have to
+                        # explicitly dump them to the session log.
+                        session_logger.log_command(text)
+                        with session_logger.patch():
+                            self.parse_and_evaluate(text)
+                    else:
+                        self.parse_and_evaluate(text)
                 except KeyboardInterrupt:
                     pass
         except EOFError:
