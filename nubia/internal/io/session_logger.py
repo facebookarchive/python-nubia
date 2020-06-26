@@ -8,50 +8,61 @@
 
 import re
 import sys
+import threading
 from contextlib import contextmanager
 
-from prompt_toolkit.patch_stdout import StdoutProxy
 
-
-class SessionLogger(StdoutProxy):
+class SessionLogger:
     """
     SessionLogger is used to intercept stdout content and duplicates it to
     a session log file.
+    Inspired from prompt_toolkit.StdoutProxy but without the buffering.
     """
 
     def __init__(self, file):
-        super().__init__(raw=False)
         self._log_file = file
+        self._lock = threading.RLock()
+        self.original_stdout = sys.stdout
+
+        # errors/encoding attribute for compatibility with sys.stdout.
+        self.errors = sys.stdout.errors
+        self.encoding = sys.stdout.encoding
 
     def path(self):
         return self._log_file.name
 
     def log_command(self, cmd):
         cmd = self._strip_ansii_colors(cmd)
-        self._log_file.write(f"> {cmd}\n")
+        with self._lock:
+            self._log_file.write(f"\n> {cmd}\n")
 
     def write(self, data):
-        super().write(data)
-        self._log_file.write(self._strip_ansii_colors(data))
+        with self._lock:
+            self.original_stdout.write(data)
+            self._log_file.write(self._strip_ansii_colors(data))
 
     def flush(self):
-        super().flush()
-        self._log_file.flush()
+        with self._lock:
+            self.original_stdout.flush()
+            self._log_file.flush()
 
     def _strip_ansii_colors(self, text):
         return re.sub('\x1b\\[.+?m', '', text)
 
+    def isatty(self):
+        return self.original_stdout.isatty()
+
+    def fileno(self):
+        return self.original_stdout.fileno()
+
     @contextmanager
     def patch(self):
         original_stdout = sys.stdout
-        original_stderr = sys.stderr
 
         sys.stdout = self
-        sys.stderr = self
 
         try:
             yield
         finally:
             self.flush()
             sys.stdout = original_stdout
-            sys.stderr = original_stderr
