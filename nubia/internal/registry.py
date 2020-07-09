@@ -77,7 +77,7 @@ class CommandsRegistry:
             self._cmd_instance_map[cmd.lower()] = cmd_instance
             if cmd not in self._completer.words:
                 self._completer.words.append(cmd)
-                self._completer.meta_dict[cmd] = cmd_instance.get_help(cmd)
+                self._completer.meta_dict[cmd] = cmd_instance.get_help_short(cmd)
 
         aliases = cmd_instance.get_cli_aliases()
         for alias in aliases:

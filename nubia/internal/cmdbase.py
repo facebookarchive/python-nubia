@@ -12,7 +12,6 @@ import copy
 import inspect
 import sys
 import traceback
-import typing
 from collections import OrderedDict
 from textwrap import dedent
 from typing import Iterable
@@ -117,6 +116,13 @@ class Command:
         """
         pass
 
+    def get_help_short(self, cmd, *args):
+        """Return a shortened help.
+
+        This is for example used for interactive autocompletion."""
+        help = self.get_help(cmd, *args)
+        return help.split("\n", 1)[0] if help else None
+
     @property
     def super_command(self) -> bool:
         """
@@ -190,7 +196,11 @@ class AutoCommand(Command):
             for k, v in get_arguments_for_inspection(self.metadata, key_values).items()
             if v is not None
         }
-        remaining = {k: v for k, v in key_values.items() if k.replace('-', '_') not in kwargs.keys()}
+        remaining = {
+            k: v
+            for k, v in key_values.items()
+            if k.replace("-", "_") not in kwargs.keys()
+        }
         return self._fn(**kwargs), remaining
 
     def run_interactive(self, cmd, args, raw):
