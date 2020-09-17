@@ -7,11 +7,15 @@
 # LICENSE file in the root directory of this source tree.
 #
 
-from typing import List, Tuple, Any
 import logging
 import os
-import sys
+from typing import Any, List, Tuple
 
+from nubia.internal.helpers import catchall, find_approx, suggestions_msg
+from nubia.internal.io.eventbus import Listener
+from nubia.internal.options import Options
+from nubia.internal.ui.lexer import NubiaLexer
+from nubia.internal.ui.style import shell_style
 from prompt_toolkit import PromptSession
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from prompt_toolkit.completion import Completer
@@ -21,14 +25,7 @@ from prompt_toolkit.formatted_text import PygmentsTokens
 from prompt_toolkit.history import FileHistory, InMemoryHistory
 from prompt_toolkit.layout.processors import HighlightMatchingBracketProcessor
 from prompt_toolkit.lexers import PygmentsLexer
-
-from nubia.internal.ui.lexer import NubiaLexer
 from termcolor import cprint
-
-from nubia.internal.helpers import catchall
-from nubia.internal.io.eventbus import Listener
-from nubia.internal.options import Options
-from nubia.internal.ui.style import shell_style
 
 
 def split_command(text):
@@ -60,9 +57,7 @@ class IOLoop(Listener):
         # If EDITOR does not exist, take EMACS
         # if it does, try fit the EMACS/VI pattern using upper
         editor = getattr(
-            EditingMode,
-            os.environ.get("EDITOR", "EMACS").upper(),
-            EditingMode.EMACS,
+            EditingMode, os.environ.get("EDITOR", "EMACS").upper(), EditingMode.EMACS
         )
 
         return PromptSession(
@@ -93,20 +88,33 @@ class IOLoop(Listener):
             return self.evaluate_command(cmd, args, input)
 
     def evaluate_command(self, cmd, args, raw):
-        if cmd not in self._command_registry:
-            print()
-            cprint(
-                "Unknown Command '{}',{} type `help` to see all "
-                "available commands".format(
-                    cmd, self._command_registry.find_approx(cmd)
-                ),
-                "magenta",
-                attrs=["bold"],
-            )
-        else:
-            if args is None:
-                args = ""
+        args = args or ""
+
+        if cmd in self._command_registry:
             cmd_instance = self._command_registry.find_command(cmd)
+        else:
+            suggestions = find_approx(
+                cmd, self._command_registry.get_all_commands_map()
+            )
+            if self._options.auto_execute_single_suggestions and len(suggestions) == 1:
+                print()
+                cprint(
+                    "Auto-correcting '{}' to '{}'".format(cmd, suggestions[0]),
+                    "red",
+                    attrs=["bold"],
+                )
+                cmd_instance = self._command_registry.find_command(suggestions[0])
+            else:
+                print()
+                cprint(
+                    "Unknown Command '{}',{} type `help` to see all "
+                    "available commands".format(cmd, suggestions_msg(suggestions)),
+                    "red",
+                    attrs=["bold"],
+                )
+                cmd_instance = None
+
+        if cmd_instance is not None:
             try:
                 ret = self._blacklist.is_blacklisted(cmd)
                 if ret:
@@ -138,9 +146,7 @@ class IOLoop(Listener):
                 try:
                     text = prompt.prompt(
                         PygmentsTokens(self._get_prompt_tokens()),
-                        rprompt=PygmentsTokens(
-                            self._status_bar.get_rprompt_tokens()
-                        ),
+                        rprompt=PygmentsTokens(self._status_bar.get_rprompt_tokens()),
                     )
                     session_logger = self._plugin.get_session_logger(self._ctx)
                     if session_logger:

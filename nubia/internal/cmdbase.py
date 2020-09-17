@@ -19,7 +19,7 @@ from typing import Iterable
 from nubia.internal import parser
 from nubia.internal.completion import AutoCommandCompletion
 from nubia.internal.exceptions import CommandParseError
-from nubia.internal.helpers import function_to_str
+from nubia.internal.helpers import find_approx, function_to_str, suggestions_msg
 from nubia.internal.typing import FunctionInspection, inspect_object
 from nubia.internal.typing.argparse import (
     get_arguments_for_command,
@@ -224,14 +224,38 @@ class AutoCommand(Command):
                         "red",
                     )
                     return 2
+                subcommands = self._get_subcommands()
+
+                if subcommand not in subcommands:
+                    suggestions = find_approx(subcommand, subcommands)
+                    if (
+                        self._options.auto_execute_single_suggestions
+                        and len(suggestions) == 1
+                    ):
+                        print()
+                        cprint(
+                            "Auto-correcting '{}' to '{}'".format(
+                                subcommand, suggestions[0]
+                            ),
+                            "red",
+                            attrs=["bold"],
+                        )
+                        subcommand = suggestions[0]
+                    else:
+                        print()
+                        cprint(
+                            "Invalid sub-command '{}',{}, "
+                            "valid sub-commands: {}".format(
+                                subcommand,
+                                suggestions_msg(suggestions),
+                                ", ".join(self._get_subcommands()),
+                            ),
+                            "red",
+                            attrs=["bold"],
+                        )
+                        return 2
+
                 sub_inspection = self.subcommand_metadata(subcommand)
-                if not sub_inspection:
-                    cprint(
-                        "Invalid sub-command '{}', valid values: "
-                        "{}".format(subcommand, ", ".join(self._get_subcommands())),
-                        "red",
-                    )
-                    return 2
                 instance, remaining_args = self._create_subcommand_obj(args_dict)
                 assert instance
                 args_dict = remaining_args

@@ -10,7 +10,12 @@
 import unittest
 from typing import Dict, List, Optional, Union
 
-from nubia.internal.helpers import catchall, function_to_str
+from nubia.internal.helpers import (
+    catchall,
+    find_approx,
+    function_to_str,
+    suggestions_msg,
+)
 from nubia.internal.typing.inspect import is_optional_type
 
 
@@ -42,9 +47,44 @@ class HelpersTest(unittest.TestCase):
         self.assertRaises(KeyboardInterrupt, catchall, raise_keyboard_interrupt)
         self.assertRaises(SystemExit, catchall, raise_sysexit)
 
+    def test_find_approx(self):
+        commands_map = ["maintenance", "malloc", "move", "list"]
+
+        # check levenshtein approximation
+        self.assertEqual(find_approx("maintenanec", commands_map), ["maintenance"])
+        self.assertEqual(find_approx("ls", commands_map), ["list"])
+
+        # check prefix matching with single result
+        self.assertEqual(find_approx("mal", commands_map), ["malloc"])
+        self.assertEqual(find_approx("maint", commands_map), ["maintenance"])
+
+        # check prefix matching and levenshtein don't generate duplicate suggestions
+        self.assertEqual(find_approx("lis", commands_map), ["list"])
+
+        # check prefix matching with more than one result - should return none
+        self.assertEqual(find_approx("ma", commands_map), ["maintenance", "malloc"])
+        self.assertEqual(
+            find_approx("m", commands_map), ["maintenance", "malloc", "move"]
+        )
+
+        # check no results
+        self.assertEqual(find_approx("a", commands_map), [])
+
     def test_is_optional(self):
         self.assertFalse(is_optional_type(List[str]))
         self.assertFalse(is_optional_type(Dict[str, int]))
         self.assertFalse(is_optional_type(Union[str, int]))
         self.assertTrue(is_optional_type(Optional[str]))
         self.assertTrue(is_optional_type(Union[str, None]))
+
+    def test_suggestions_msg(self):
+        suggestions = []
+        self.assertEqual(suggestions_msg(suggestions), "")
+
+        suggestions = ["one", "two"]
+        self.assertEqual(suggestions_msg(suggestions), " Did you mean one or two?")
+
+        suggestions = ["one", "two", "three"]
+        self.assertEqual(
+            suggestions_msg(suggestions), " Did you mean one, two or three?"
+        )

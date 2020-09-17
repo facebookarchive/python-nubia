@@ -53,7 +53,7 @@ class CommandSpecTest(unittest.TestCase):
         self.assertEqual(22, shell.run_cli_line("test_shell bleh_command --arg a b"))
         self.assertEqual(22, shell.run_interactive_line('bleh_command arg=["a","b"]'))
         self.assertEqual(22, shell.run_interactive_line("bleh_command arg=[a, b]"))
-        
+
     def test_command_aliases_spec(self):
         """
         Testing aliases
@@ -71,6 +71,53 @@ class CommandSpecTest(unittest.TestCase):
 
         shell = TestShell(commands=[test_command])
         self.assertEqual(22, shell.run_cli_line("test_shell bleh -i a b"))
+
+    def test_command_find_approx_spec(self):
+        """
+        Testing approximate command / subcommand typing
+        """
+
+        @command("command_first", aliases=["first"])
+        @argument("arg", description="argument help", aliases=["i"])
+        def test_command_1(arg: int = 22) -> int:
+            """
+            Sample Docstring
+            """
+            cprint(arg, "green")
+            return arg
+
+        @command("command_second", aliases=["second"])
+        @argument("arg", description="argument help", aliases=["i"])
+        def test_command_2(arg: int = 23) -> int:
+            """
+            Sample Docstring
+            """
+            cprint(arg, "green")
+            return arg
+
+        shell = TestShell(commands=[test_command_1, test_command_2])
+
+        # correct command name
+        self.assertEqual(22, shell.run_interactive_line("first"))
+        # unique prefix command name
+        self.assertEqual(22, shell.run_interactive_line("f"))
+        # unique levenshtein command name
+        self.assertEqual(22, shell.run_interactive_line("firts"))
+        # unique prefix + levenshtein command name
+        self.assertEqual(22, shell.run_interactive_line("firs"))
+        # non-unique prefix command name
+        self.assertEqual(None, shell.run_interactive_line("command"))
+
+        # approximate matching only works for interactive mode, not CLI
+        self.assertEqual(22, shell.run_cli_line("test_shell first"))
+        with self.assertRaises(SystemExit):
+            shell.run_cli_line("test_shell f")
+        with self.assertRaises(SystemExit):
+            shell.run_cli_line("test_shell firts")
+        with self.assertRaises(SystemExit):
+            shell.run_cli_line("test_shell firs")
+        with self.assertRaises(SystemExit):
+            shell.run_cli_line("test_shell command")
 
     def test_no_type_works_the_same(self):
         @command

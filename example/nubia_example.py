@@ -8,9 +8,11 @@
 #
 
 import sys
+
+import example.commands
 from nubia import Nubia, Options
 from nubia_plugin import NubiaExamplePlugin
-import example.commands
+
 
 if __name__ == "__main__":
     plugin = NubiaExamplePlugin()
@@ -18,6 +20,8 @@ if __name__ == "__main__":
         name="nubia_example",
         command_pkgs=example.commands,
         plugin=plugin,
-        options=Options(persistent_history=False),
+        options=Options(
+            persistent_history=False, auto_execute_single_suggestions=False
+        ),
     )
     sys.exit(shell.run())

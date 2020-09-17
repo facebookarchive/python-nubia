@@ -12,8 +12,10 @@ import re
 import signal
 import string
 import subprocess
-
 from collections import namedtuple
+from typing import Iterable, Optional
+
+import jellyfish
 
 
 def add_command_arguments(parser, options):
@@ -175,3 +177,43 @@ def catchall(func, *args):
         func(*args)
     except Exception as e:
         print("Error logging to scuba: {}".format(str(e)))
+
+
+def find_approx(cmd_input: str, cmd_map: Optional[Iterable[str]]) -> Iterable[str]:
+    """Finds the closest command to the passed cmd, this is used in case we
+    cannot find an exact match for the cmd
+    We will use two methods, unique prefix match and levenshtein distance match
+    """
+
+    prefix_suggestions = set()
+    levenshtein_suggestions = {}
+
+    for another_command in cmd_map:
+        if str(another_command).startswith(str(cmd_input).lower()):
+            prefix_suggestions.add(another_command)
+        #  removing single letter levenshtein suggestions
+        #  such as `?`, `q` etc
+        elif len(another_command) > 1:
+            distance = jellyfish.damerau_levenshtein_distance(
+                str(cmd_input).lower(), another_command
+            )
+            if distance <= 2:
+                levenshtein_suggestions.update({another_command: distance})
+
+    if prefix_suggestions:
+        return sorted(prefix_suggestions)
+    else:
+        # sort suggestions by levenshtein distance and then by name
+        return [
+            k
+            for k, _ in sorted(
+                levenshtein_suggestions.items(), key=lambda i: (i[1], i[0])
+            )
+        ]
+
+
+def suggestions_msg(suggestions: Optional[Iterable[str]]) -> str:
+    if not suggestions:
+        return ""
+    else:
+        return f" Did you mean {', '.join(suggestions[:-1])} or {suggestions[-1]}?"
