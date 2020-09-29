@@ -107,7 +107,7 @@ class IOLoop(Listener):
             else:
                 print()
                 cprint(
-                    "Unknown Command '{}',{} type `help` to see all "
+                    "Unknown Command '{}'{} type `help` to see all "
                     "available commands".format(cmd, suggestions_msg(suggestions)),
                     "red",
                     attrs=["bold"],

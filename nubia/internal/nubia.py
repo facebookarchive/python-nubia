@@ -141,8 +141,9 @@ class Nubia:
             self._command_pkgs = [self._command_pkgs]
         for pkg in self._command_pkgs:
             for cmd in cmdloader.load_commands(pkg):
-                self._registry.register_command(AutoCommand(cmd), override=True)
-
+                self._registry.register_command(
+                    AutoCommand(cmd, self._options), override=True
+                )
         # By default, if we didn't receive any command we will use the connect
         # command which drops us to an interactive mode.
         self._opts_parser.set_default_subparser("connect")

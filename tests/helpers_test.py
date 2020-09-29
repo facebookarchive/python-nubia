@@ -82,9 +82,9 @@ class HelpersTest(unittest.TestCase):
         self.assertEqual(suggestions_msg(suggestions), "")
 
         suggestions = ["one", "two"]
-        self.assertEqual(suggestions_msg(suggestions), " Did you mean one or two?")
+        self.assertEqual(suggestions_msg(suggestions), ", Did you mean one or two?")
 
         suggestions = ["one", "two", "three"]
         self.assertEqual(
-            suggestions_msg(suggestions), " Did you mean one, two or three?"
+            suggestions_msg(suggestions), ", Did you mean one, two or three?"
         )

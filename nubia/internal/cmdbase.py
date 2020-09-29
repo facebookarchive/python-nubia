@@ -14,12 +14,13 @@ import sys
 import traceback
 from collections import OrderedDict
 from textwrap import dedent
-from typing import Iterable
+from typing import Iterable, Optional
 
 from nubia.internal import parser
 from nubia.internal.completion import AutoCommandCompletion
 from nubia.internal.exceptions import CommandParseError
 from nubia.internal.helpers import find_approx, function_to_str, suggestions_msg
+from nubia.internal.options import Options
 from nubia.internal.typing import FunctionInspection, inspect_object
 from nubia.internal.typing.argparse import (
     get_arguments_for_command,
@@ -138,9 +139,10 @@ class Command:
 
 
 class AutoCommand(Command):
-    def __init__(self, fn):
+    def __init__(self, fn, options: Optional[Options] = None):
         self._built_in = False
         self._fn = fn
+        self._options = options or Options()
 
         if not callable(fn):
             raise ValueError("fn argument must be a callable")
@@ -229,8 +231,8 @@ class AutoCommand(Command):
                 if subcommand not in subcommands:
                     suggestions = find_approx(subcommand, subcommands)
                     if (
-                        self._options.auto_execute_single_suggestions
-                        and len(suggestions) == 1
+                        len(suggestions) == 1
+                        and self._options.auto_execute_single_suggestions
                     ):
                         print()
                         cprint(
@@ -244,7 +246,7 @@ class AutoCommand(Command):
                     else:
                         print()
                         cprint(
-                            "Invalid sub-command '{}',{}, "
+                            "Invalid sub-command '{}'{} "
                             "valid sub-commands: {}".format(
                                 subcommand,
                                 suggestions_msg(suggestions),

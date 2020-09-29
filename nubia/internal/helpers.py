@@ -216,4 +216,4 @@ def suggestions_msg(suggestions: Optional[Iterable[str]]) -> str:
     if not suggestions:
         return ""
     else:
-        return f" Did you mean {', '.join(suggestions[:-1])} or {suggestions[-1]}?"
+        return f", Did you mean {', '.join(suggestions[:-1])} or {suggestions[-1]}?"
