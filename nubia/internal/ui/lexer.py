@@ -82,11 +82,11 @@ class NubiaLexer(RegexLexer):
             (r"^(\?|help)\s*$", Name.Help),
             (r"^(q|quit|exit)\s*$", Name.Exit),
             # Command with Subcommands
-            (r"(" + _identifier + ")(\s*=\s*)", bygroups(Name.Key, Operator)),
+            (r"(" + _identifier + r")(\s*=\s*)", bygroups(Name.Key, Operator)),
             # Commands
-            (r"^" + _command + "(\s+)" + _command + "(\s+)", command_callback),
-            (r"^" + _command + "(\s+|$)", command_callback),
-            (r"(" + _identifier + ")(\s*)", Name.Symbol),
+            (r"^" + _command + r"(\s+)" + _command + r"(\s+)", command_callback),
+            (r"^" + _command + r"(\s+|$)", command_callback),
+            (r"(" + _identifier + r")(\s*)", Name.Symbol),
             (r"(True|False|true|false)", Keyword),
             (r"\-?[0-9]+", Number.Integer),
             (r"'(''|[^'])*'", String.Single),
