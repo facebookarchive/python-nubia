@@ -35,6 +35,8 @@ If you start a nubia-based program without a command, it automatically starts an
 The CLI mode works exactly like any traditional unix-based command line utility.
 ![Non-interactive Demo](docs/non_interactive.png?raw=true "Non-interactive demo")
 
+Have your `@command` decorated function return an `int` to send that value as the Unix return code for your non interactive CLI.
+
 ## Examples
 It starts with a function like this:
 ```py
@@ -47,18 +49,22 @@ from nubia import argument, command, context
 @command
 @argument("hosts", description="Hostnames to resolve", aliases=["i"])
 @argument("bad_name", name="nice", description="testing")
-def lookup(hosts: typing.List[str], bad_name: int):
+def lookup(hosts: typing.List[str], bad_name: int) -> int:
     """
     This will lookup the hostnames and print the corresponding IP addresses
     """
     ctx = context.get_context()
+
+    if not hosts:
+        cprint("No hosts supplied via --hosts")
+        return 1
+
     print(f"hosts: {hosts}")
     cprint(f"Verbose? {ctx.verbose}")
 
     for host in hosts:
         cprint(f"{host} is {socket.gethostbyname(host)}")
 
-    # optional, by default it's 0
     return 0
 ```
 
