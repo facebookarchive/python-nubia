@@ -1,6 +1,6 @@
 # python-nubia
 
-[![Build Status](https://travis-ci.com/facebookincubator/python-nubia.svg?token=aPxsLj8RpMSsSYqaqL5e&branch=master)](https://travis-ci.com/facebookincubator/python-nubia)
+![Build Status](https://github.com/facebookincubator/python-nubia/workflows/ci/badge.svg)
 [![Coverage](https://codecov.io/gh/facebookincubator/python-nubia/branch/master/graph/badge.svg)](https://codecov.io/github/facebookincubator/python-nubia)
 [![PyPI version](https://badge.fury.io/py/python-nubia.svg)](https://badge.fury.io/py/python-nubia)
 
