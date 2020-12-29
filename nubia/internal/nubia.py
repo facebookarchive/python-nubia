@@ -274,7 +274,7 @@ class Nubia:
     def _pre_run(self, cli_args):
         args = self._parse_args(cli_args)
         self._setup_logging(args)
-        # check if we can add colors to sdout
+        # check if we can add colors to stdout
         self._setup_terminal(args)
 
         self._validate_args(args)
