@@ -203,13 +203,13 @@ class Nubia:
         self._ctx.on_interactive(args)
         return io_loop
 
-    def start_interactive(self, args):
+    async def start_interactive(self, args):
         io_loop = self._create_interactive_io_loop(args)
         ret = 0
         # Only run the Interactive mode if std is a tty, otherwise
         # we should rad the input from stdin, process it, and exit.
         if sys.stdin.isatty():
-            io_loop.run()
+            await io_loop.run()
             return ret
         else:
             # Read the command from stdin and run
@@ -217,7 +217,7 @@ class Nubia:
             for command in commands:
                 # execute
                 print("> {}".format(command))
-                ret = io_loop.parse_and_evaluate(command)
+                ret = await io_loop.parse_and_evaluate(command)
                 # We fail execution on the first failing command
                 if ret:
                     return ret
@@ -283,7 +283,7 @@ class Nubia:
         self._registry.set_cli_args(args)
         return args
 
-    def run(self, cli_args=sys.argv, ipython=False):
+    async def run(self, cli_args=sys.argv, ipython=False):
         """
         Runs nubia either in interactive or cli (or parsing commands from
         stdin) based on the cli_args supplied (defaults to sys.argv). This will
@@ -309,7 +309,7 @@ class Nubia:
             return self.start_ipython(args)
         # by default, if no command is passed we will get 'connect'
         if args._cmd == "connect":
-            return self.start_interactive(args)
+            return await self.start_interactive(args)
         else:
             ret = self.run_cli(args)
             catchall(self.usage_logger.post_exec, args._cmd, cli_args, ret, True)

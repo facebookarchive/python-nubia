@@ -7,6 +7,7 @@
 # LICENSE file in the root directory of this source tree.
 #
 
+import asyncio
 import unittest
 from typing import List, Optional
 
@@ -30,8 +31,9 @@ class CommandSpecTest(unittest.TestCase):
 
         shell = TestShell(commands=[test_command])
         self.assertEqual(22, shell.run_cli_line("test_shell test-command --arg a b"))
-        self.assertEqual(22, shell.run_interactive_line('test-command arg=["a","b"]'))
-        self.assertEqual(22, shell.run_interactive_line("test-command arg=[a, b]"))
+        loop = asyncio.get_event_loop()
+        self.assertEqual(22, loop.run_until_complete(shell.run_interactive_line('test-command arg=["a","b"]')))
+        self.assertEqual(22, loop.run_until_complete(shell.run_interactive_line("test-command arg=[a, b]")))
 
     def test_command_name_spec2(self):
         """
@@ -51,8 +53,9 @@ class CommandSpecTest(unittest.TestCase):
 
         shell = TestShell(commands=[test_command])
         self.assertEqual(22, shell.run_cli_line("test_shell bleh_command --arg a b"))
-        self.assertEqual(22, shell.run_interactive_line('bleh_command arg=["a","b"]'))
-        self.assertEqual(22, shell.run_interactive_line("bleh_command arg=[a, b]"))
+        loop = asyncio.get_event_loop()
+        self.assertEqual(22, loop.run_until_complete(shell.run_interactive_line('bleh_command arg=["a","b"]')))
+        self.assertEqual(22, loop.run_until_complete(shell.run_interactive_line("bleh_command arg=[a, b]")))
 
     def test_command_aliases_spec(self):
         """
@@ -96,17 +99,18 @@ class CommandSpecTest(unittest.TestCase):
             return arg
 
         shell = TestShell(commands=[test_command_1, test_command_2])
-
+        loop = asyncio.get_event_loop()
+        
         # correct command name
-        self.assertEqual(22, shell.run_interactive_line("first"))
+        self.assertEqual(22, loop.run_until_complete(shell.run_interactive_line("first")))
         # unique prefix command name
-        self.assertEqual(22, shell.run_interactive_line("f"))
+        self.assertEqual(22, loop.run_until_complete(shell.run_interactive_line("f")))
         # unique levenshtein command name
-        self.assertEqual(22, shell.run_interactive_line("firts"))
+        self.assertEqual(22, loop.run_until_complete(shell.run_interactive_line("firts")))
         # unique prefix + levenshtein command name
-        self.assertEqual(22, shell.run_interactive_line("firs"))
+        self.assertEqual(22, loop.run_until_complete(shell.run_interactive_line("firs")))
         # non-unique prefix command name
-        self.assertEqual(None, shell.run_interactive_line("command"))
+        self.assertEqual(None, loop.run_until_complete(shell.run_interactive_line("command")))
 
         # approximate matching only works for interactive mode, not CLI
         self.assertEqual(22, shell.run_cli_line("test_shell first"))
@@ -132,8 +136,9 @@ class CommandSpecTest(unittest.TestCase):
 
         shell = TestShell(commands=[test_command])
         self.assertEqual(65, shell.run_cli_line("test_shell test-command 1"))
-        self.assertEqual(65, shell.run_interactive_line("test-command 1"))
-        self.assertEqual(65, shell.run_interactive_line('test-command "1"'))
+        loop = asyncio.get_event_loop()
+        self.assertEqual(65, loop.run_until_complete(shell.run_interactive_line("test-command 1")))
+        self.assertEqual(65, loop.run_until_complete(shell.run_interactive_line('test-command "1"')))
 
         @command
         @argument("arg")
@@ -147,8 +152,9 @@ class CommandSpecTest(unittest.TestCase):
 
         shell = TestShell(commands=[test_command])
         self.assertEqual(65, shell.run_cli_line("test_shell test-command --arg 1"))
-        self.assertEqual(65, shell.run_interactive_line("test-command arg=1"))
-        self.assertEqual(65, shell.run_interactive_line('test-command arg="1"'))
+        loop = asyncio.get_event_loop()
+        self.assertEqual(65, loop.run_until_complete(shell.run_interactive_line("test-command arg=1")))
+        self.assertEqual(65, loop.run_until_complete(shell.run_interactive_line('test-command arg="1"')))
 
     def test_command_with_postional(self):
         @command
@@ -169,7 +175,8 @@ class CommandSpecTest(unittest.TestCase):
 
         shell = TestShell(commands=[test_command])
         self.assertEqual(66, shell.run_cli_line("test_shell test-command 1 2 nubia"))
-        self.assertEqual(66, shell.run_interactive_line("test-command 1 2 nubia"))
+        loop = asyncio.get_event_loop()
+        self.assertEqual(66, loop.run_until_complete(shell.run_interactive_line("test-command 1 2 nubia")))
 
     def test_command_with_extra_spaces(self):
         @command
@@ -183,14 +190,15 @@ class CommandSpecTest(unittest.TestCase):
             return True
 
         shell = TestShell(commands=[test_command])
-        self.assertTrue(shell.run_interactive_line("test-command 1"))
-        self.assertTrue(shell.run_interactive_line("test-command  1"))
-        self.assertTrue(shell.run_interactive_line("test-command   1"))
-        self.assertTrue(shell.run_interactive_line(" test-command 1"))
-        self.assertTrue(shell.run_interactive_line("  test-command 1"))
-        self.assertTrue(shell.run_interactive_line("test-command 1 "))
-        self.assertTrue(shell.run_interactive_line("test-command 1  "))
-        self.assertTrue(shell.run_interactive_line("  test-command  1  "))
+        loop = asyncio.get_event_loop()
+        self.assertTrue(loop.run_until_complete(shell.run_interactive_line("test-command 1")))
+        self.assertTrue(loop.run_until_complete(shell.run_interactive_line("test-command  1")))
+        self.assertTrue(loop.run_until_complete(shell.run_interactive_line("test-command   1")))
+        self.assertTrue(loop.run_until_complete(shell.run_interactive_line(" test-command 1")))
+        self.assertTrue(loop.run_until_complete(shell.run_interactive_line("  test-command 1")))
+        self.assertTrue(loop.run_until_complete(shell.run_interactive_line("test-command 1 ")))
+        self.assertTrue(loop.run_until_complete(shell.run_interactive_line("test-command 1  ")))
+        self.assertTrue(loop.run_until_complete(shell.run_interactive_line("  test-command  1  ")))
 
     def test_command_with_postional_and_named_arguments(self):
         @command
@@ -212,12 +220,13 @@ class CommandSpecTest(unittest.TestCase):
         self.assertEqual(
             66, shell.run_cli_line("test_shell test-command --arg1=1 2 nubia")
         )
-        self.assertEqual(66, shell.run_interactive_line("test-command arg1=1 2 nubia"))
+        loop = asyncio.get_event_loop()
+        self.assertEqual(66, loop.run_until_complete(shell.run_interactive_line("test-command arg1=1 2 nubia")))
         self.assertEqual(
-            66, shell.run_interactive_line("test-command arg1=1 arg2=2 nubia")
-        )
+            66, loop.run_until_complete(shell.run_interactive_line("test-command arg1=1 arg2=2 nubia")
+        ))
         # Fails parsing because positionals have to be at the end
-        self.assertEqual(1, shell.run_interactive_line("test-command 2 nubia arg1=1"))
+        self.assertEqual(1, loop.run_until_complete(shell.run_interactive_line("test-command 2 nubia arg1=1")))
 
     def test_command_with_mutex_groups(self):
         @command(exclusive_arguments=["arg1", "arg2"])
@@ -231,17 +240,18 @@ class CommandSpecTest(unittest.TestCase):
 
         shell = TestShell(commands=[test_command])
         self.assertEqual(64, shell.run_cli_line("test_shell test-command --arg1 1"))
-        self.assertEqual(64, shell.run_interactive_line("test-command arg1=1"))
+        loop = asyncio.get_event_loop()
+        self.assertEqual(64, loop.run_until_complete(shell.run_interactive_line("test-command arg1=1")))
 
         self.assertEqual(2, shell.run_cli_line("test_shell test-command --arg2 2"))
-        self.assertEqual(2, shell.run_interactive_line("test-command arg2=2"))
+        self.assertEqual(2, loop.run_until_complete(shell.run_interactive_line("test-command arg2=2")))
 
         with self.assertRaises(SystemExit):
             shell.run_cli_line("test_shell test-command --arg1 1 --arg2 2")
 
         self.assertEqual(
             66,
-            shell.run_interactive_line("test-command arg1=1 arg2=2"),
+            loop.run_until_complete(shell.run_interactive_line("test-command arg1=1 arg2=2")),
             "We are not enforsing mutex groups on interactive",
         )
 
@@ -278,7 +288,8 @@ class CommandSpecTest(unittest.TestCase):
 
         shell = TestShell(commands=[test_command])
         self.assertEqual(22, shell.run_cli_line("test_shell test-command"))
-        self.assertEqual(22, shell.run_interactive_line("test-command"))
+        loop = asyncio.get_event_loop()
+        self.assertEqual(22, loop.run_until_complete(shell.run_interactive_line("test-command")))
 
     def test_command_optional_argument(self):
         """
@@ -296,10 +307,11 @@ class CommandSpecTest(unittest.TestCase):
             return sum(int(x) for x in arg)
 
         shell = TestShell(commands=[test_command])
+        loop = asyncio.get_event_loop()
         self.assertEqual(42, shell.run_cli_line("test_shell test-command"))
-        self.assertEqual(42, shell.run_interactive_line("test-command"))
+        self.assertEqual(42, loop.run_until_complete(shell.run_interactive_line("test-command")))
         self.assertEqual(0, shell.run_cli_line("test_shell test-command --arg 0"))
-        self.assertEqual(0, shell.run_interactive_line("test-command arg=[0]"))
+        self.assertEqual(0, loop.run_until_complete(shell.run_interactive_line("test-command arg=[0]")))
 
     def test_command_one_required_one_default_argument(self):
         """
@@ -320,7 +332,8 @@ class CommandSpecTest(unittest.TestCase):
 
         shell = TestShell(commands=[test_command])
         self.assertEqual(22, shell.run_cli_line("test_shell bleh_command --arg1=21"))
-        self.assertEqual(22, shell.run_interactive_line("bleh_command arg1=21"))
+        loop = asyncio.get_event_loop()
+        self.assertEqual(22, loop.run_until_complete(shell.run_interactive_line("bleh_command arg1=21")))
 
     def test_command_for_blacklist_plugin_allowed(self):
         @command("allowed")
@@ -333,7 +346,8 @@ class CommandSpecTest(unittest.TestCase):
 
         shell = TestShell(commands=[test_command])
         self.assertEqual(42, shell.run_cli_line("test_shell allowed"))
-        self.assertEqual(42, shell.run_interactive_line("allowed"))
+        loop = asyncio.get_event_loop()
+        self.assertEqual(42, loop.run_until_complete(shell.run_interactive_line("allowed")))
 
     def test_command_for_blacklist_plugin_blacklisted(self):
         @command("blocked")
@@ -346,7 +360,8 @@ class CommandSpecTest(unittest.TestCase):
 
         shell = TestShell(commands=[test_command])
         self.assertEqual(1, shell.run_cli_line("test_shell blocked"))
-        self.assertEqual(1, shell.run_interactive_line("blocked"))
+        loop = asyncio.get_event_loop()
+        self.assertEqual(1, loop.run_until_complete(shell.run_interactive_line("blocked")))
 
     def test_command_with_negative_ints(self):
         @command("minus_command")
@@ -362,7 +377,8 @@ class CommandSpecTest(unittest.TestCase):
         # Cli run
         self.assertEqual(42, shell.run_cli_line("test_shell minus_command --arg1=-1"))
         # Interactive
-        self.assertEqual(42, shell.run_interactive_line("minus_command arg1=-1"))
+        loop = asyncio.get_event_loop()
+        self.assertEqual(42, loop.run_until_complete(shell.run_interactive_line("minus_command arg1=-1")))
 
     def test_command_with_negative_floats(self):
         @command("minus_command")
@@ -379,8 +395,9 @@ class CommandSpecTest(unittest.TestCase):
         self.assertEqual(42, shell.run_cli_line("test_shell minus_command --arg1=-1"))
         self.assertEqual(42, shell.run_cli_line("test_shell minus_command --arg1=-1.0"))
         # Interactive
-        self.assertEqual(42, shell.run_interactive_line("minus_command arg1=-1"))
-        self.assertEqual(42, shell.run_interactive_line("minus_command arg1=-1.0"))
+        loop = asyncio.get_event_loop()
+        self.assertEqual(42, loop.run_until_complete(shell.run_interactive_line("minus_command arg1=-1")))
+        self.assertEqual(42, loop.run_until_complete(shell.run_interactive_line("minus_command arg1=-1.0")))
 
     def test_command_deprecation(self):
         @deprecated(superseded_by="new-command")
@@ -402,9 +419,10 @@ class CommandSpecTest(unittest.TestCase):
 
         shell = TestShell(commands=[old_command, new_command])
         self.assertEqual(42, shell.run_cli_line("test_shell old-command"))
-        self.assertEqual(42, shell.run_interactive_line("old-command"))
+        loop = asyncio.get_event_loop()
+        self.assertEqual(42, loop.run_until_complete(shell.run_interactive_line("old-command")))
         self.assertEqual(42, shell.run_cli_line("test_shell new-command"))
-        self.assertEqual(42, shell.run_interactive_line("new-command"))
+        self.assertEqual(42, loop.run_until_complete(shell.run_interactive_line("new-command")))
 
     def test_type_lifting(self):
         @command
@@ -422,8 +440,9 @@ class CommandSpecTest(unittest.TestCase):
             "a|b", shell.run_cli_line("test_shell test-command --args a b")
         )
         # Interactive
-        self.assertEqual("a", shell.run_interactive_line('test-command args="a"'))
-        self.assertEqual("a", shell.run_interactive_line('test-command args=["a"]'))
+        loop = asyncio.get_event_loop()
+        self.assertEqual("a", loop.run_until_complete(shell.run_interactive_line('test-command args="a"')))
+        self.assertEqual("a", loop.run_until_complete(shell.run_interactive_line('test-command args=["a"]')))
         self.assertEqual(
-            "a|b", shell.run_interactive_line('test-command args=["a", "b"]')
-        )
+            "a|b", loop.run_until_complete(shell.run_interactive_line('test-command args=["a", "b"]')
+        ))

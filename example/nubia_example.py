@@ -7,6 +7,7 @@
 # LICENSE file in the root directory of this source tree.
 #
 
+import asyncio
 import sys
 
 import example.commands
@@ -24,4 +25,5 @@ if __name__ == "__main__":
             persistent_history=False, auto_execute_single_suggestions=False
         ),
     )
-    sys.exit(shell.run())
+    loop = asyncio.get_event_loop()
+    sys.exit(loop.run_until_complete(shell.run()))

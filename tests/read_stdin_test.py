@@ -6,6 +6,7 @@
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
 #
+import asyncio
 import os
 import sys
 import tempfile
@@ -34,4 +35,5 @@ class ReadStdinTest(unittest.TestCase):
         os.lseek(command_file.fileno(), 0, os.SEEK_SET)
         os.dup2(command_file.fileno(), sys.stdin.fileno())
         shell = TestShell(commands=[test_command])
-        self.assertEqual(22, shell.run(cli_args=["", "connect"]))
+        loop = asyncio.get_event_loop()
+        self.assertEqual(22, loop.run_until_complete(shell.run(cli_args=["", "connect"])))

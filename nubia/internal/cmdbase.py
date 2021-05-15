@@ -53,7 +53,7 @@ class Command:
     def set_command_registry(self, command_registry):
         self._command_registry = command_registry
 
-    def run_interactive(self, cmd, args, raw):
+    async def run_interactive(self, cmd, args, raw):
         """
         This function MUST be overridden by all commands. It will be called when
         the command is executed in interactive mode.
@@ -205,7 +205,7 @@ class AutoCommand(Command):
         }
         return self._fn(**kwargs), remaining
 
-    def run_interactive(self, cmd, args, raw):
+    async def run_interactive(self, cmd, args, raw):
         try:
             args_metadata = self.metadata.arguments
             parsed = parser.parse(args, expect_subcommand=self.super_command)
@@ -402,8 +402,7 @@ class AutoCommand(Command):
                 # convert argument names back to match the function signature
                 args_dict = {args_metadata[k].arg: v for k, v in args_dict.items()}
                 if inspect.iscoroutinefunction(fn):
-                    loop = asyncio.get_event_loop()
-                    ret = loop.run_until_complete(fn(**args_dict))
+                    ret = await fn(**args_dict)
                 else:
                     ret = fn(**args_dict)
                 ctx.set_verbose(old_verbose)
