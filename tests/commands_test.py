@@ -57,6 +57,22 @@ class CommandSpecTest(unittest.TestCase):
         self.assertEqual(22, loop.run_until_complete(shell.run_interactive_line('bleh_command arg=["a","b"]')))
         self.assertEqual(22, loop.run_until_complete(shell.run_interactive_line("bleh_command arg=[a, b]")))
 
+    def test_command_async(self):
+        @command
+        @argument("arg", description="argument help", aliases=["i"])
+        async def test_command(arg: List[str]) -> int:
+            """
+            Sample Docstring
+            """
+            self.assertEqual(["a", "b"], arg)
+            cprint(arg, "green")
+            return 22
+
+        shell = TestShell(commands=[test_command])
+        self.assertEqual(22, shell.run_cli_line("test_shell test-command --arg a b"))
+        loop = asyncio.get_event_loop()
+        self.assertEqual(22, loop.run_until_complete(shell.run_interactive_line('test-command arg=["a","b"]')))
+
     def test_command_aliases_spec(self):
         """
         Testing aliases
@@ -100,7 +116,7 @@ class CommandSpecTest(unittest.TestCase):
 
         shell = TestShell(commands=[test_command_1, test_command_2])
         loop = asyncio.get_event_loop()
-        
+
         # correct command name
         self.assertEqual(22, loop.run_until_complete(shell.run_interactive_line("first")))
         # unique prefix command name
