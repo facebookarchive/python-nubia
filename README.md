@@ -70,7 +70,7 @@ def lookup(hosts: typing.List[str], bad_name: int) -> int:
 
 ## Requirements
 
-Nubia-based applications require python 3.6+ and works with both Mac OS X or Linux. While in theory it should work on Windows, it has never been tried.
+Nubia-based applications require python 3.7+ and works with both Mac OS X or Linux. While in theory it should work on Windows, it has never been tried.
 
 ## Installing Nubia
 
