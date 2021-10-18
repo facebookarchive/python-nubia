@@ -22,7 +22,7 @@ class CommandLoaderTest(unittest.TestCase):
 
     def test_load_sample_packages(self):
         loaded = list(cmdloader.load_commands(sample_package))
-        self.assertEquals(3, len(loaded))
+        self.assertEquals(4, len(loaded))
         from tests.sample_package import commands
         from tests.sample_package.subpackage import more_commands
 

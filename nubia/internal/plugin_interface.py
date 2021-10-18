@@ -92,7 +92,7 @@ class PluginInterface:
             "-v",
             action="count",
             default=0,
-            help="Increase verbosity, can be specified " "multiple times",
+            help="Increase verbosity, can be specified multiple times",
         )
         opts_parser.add_argument(
             "--stderr",

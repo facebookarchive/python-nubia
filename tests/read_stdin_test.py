@@ -6,17 +6,19 @@
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
 #
+import asyncio
 import os
 import sys
 import tempfile
-import unittest
+
+from later.unittest import TestCase
 
 from nubia import argument, command
 from tests.util import TestShell
 
 
-class ReadStdinTest(unittest.TestCase):
-    def test_read_from_stdin(self):
+class ReadStdinTest(TestCase):
+    async def test_read_from_stdin(self):
         @command
         @argument("arg")
         def test_command(arg: str) -> int:
@@ -34,4 +36,4 @@ class ReadStdinTest(unittest.TestCase):
         os.lseek(command_file.fileno(), 0, os.SEEK_SET)
         os.dup2(command_file.fileno(), sys.stdin.fileno())
         shell = TestShell(commands=[test_command])
-        self.assertEqual(22, shell.run(cli_args=["", "connect"]))
+        self.assertEqual(22, await shell.run_async(cli_args=["", "connect"]))

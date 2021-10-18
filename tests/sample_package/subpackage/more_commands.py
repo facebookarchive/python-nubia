@@ -30,3 +30,10 @@ class SuperCommand:
         Sub-Command Docs
         """
         return None
+
+    @command
+    async def sub_command_async(self):
+        """
+        Sub-Command Docs Async
+        """
+        return None

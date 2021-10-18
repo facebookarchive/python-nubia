@@ -11,13 +11,8 @@ import collections.abc
 from typing import Iterable, List, Mapping
 
 # This is re-exported, add more if you need more from typing_inspect elsewhere.
-from typing_inspect import (
-    NEW_TYPING,
-    is_optional_type,  # noqa
-    is_tuple_type,
-    is_typevar,
-    is_union_type,
-)
+from typing_inspect import is_optional_type  # noqa
+from typing_inspect import NEW_TYPING, is_tuple_type, is_typevar, is_union_type
 
 from nubia.internal.helpers import issubclass_
 

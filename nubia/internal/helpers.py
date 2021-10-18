@@ -23,6 +23,15 @@ def add_command_arguments(parser, options):
         parser.add_argument("--{}".format(option), **extras)
 
 
+async def try_await(result):
+    """
+    Await if awaitable, otherwise return.
+    """
+    if inspect.isawaitable(result):
+        return await result
+    return result
+
+
 def run_process(process_arg_list, on_interrupt=None, working_dir=None):
     """
     This runs a process using subprocess python module but handles SIGINT

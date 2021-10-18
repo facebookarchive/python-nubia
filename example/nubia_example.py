@@ -7,6 +7,7 @@
 # LICENSE file in the root directory of this source tree.
 #
 
+import asyncio
 import sys
 
 from nubia_plugin import NubiaExamplePlugin

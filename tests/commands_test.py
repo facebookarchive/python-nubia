@@ -7,20 +7,32 @@
 # LICENSE file in the root directory of this source tree.
 #
 
-import unittest
+import asyncio
 from typing import List, Optional
 
+from later.unittest import TestCase
 from termcolor import cprint
 
 from nubia import argument, command, deprecated
 from tests.util import TestShell
 
 
-class CommandSpecTest(unittest.TestCase):
-    def test_command_name_spec1(self):
+class CommandSpecTest(TestCase):
+    async def test_command_sync(self):
+        @command
+        def test_command() -> int:
+            """
+            Sample Docstring
+            """
+            return 22
+
+        shell = TestShell(commands=[test_command])
+        self.assertEqual(22, await shell.run_cli_line("test_shell test-command "))
+
+    async def test_command_name_spec1(self):
         @command
         @argument("arg", description="argument help", aliases=["i"])
-        def test_command(arg: List[str]) -> int:
+        async def test_command(arg: List[str]) -> int:
             """
             Sample Docstring
             """
@@ -29,11 +41,18 @@ class CommandSpecTest(unittest.TestCase):
             return 22
 
         shell = TestShell(commands=[test_command])
-        self.assertEqual(22, shell.run_cli_line("test_shell test-command --arg a b"))
-        self.assertEqual(22, shell.run_interactive_line('test-command arg=["a","b"]'))
-        self.assertEqual(22, shell.run_interactive_line("test-command arg=[a, b]"))
+        self.assertEqual(
+            22, await shell.run_cli_line("test_shell test-command --arg a b")
+        )
 
-    def test_command_name_spec2(self):
+        self.assertEqual(
+            22, await shell.run_interactive_line('test-command arg=["a","b"]')
+        )
+        self.assertEqual(
+            22, await shell.run_interactive_line("test-command arg=[a, b]")
+        )
+
+    async def test_command_name_spec2(self):
         """
         Explicitly setting the command name with underscore, we should respect
         the supplied name and not auto-transform it
@@ -41,7 +60,7 @@ class CommandSpecTest(unittest.TestCase):
 
         @command("bleh_command")
         @argument("arg", description="argument help", aliases=["i"])
-        def test_command(arg: List[str]) -> int:
+        async def test_command(arg: List[str]) -> int:
             """
             Sample Docstring
             """
@@ -50,18 +69,43 @@ class CommandSpecTest(unittest.TestCase):
             return 22
 
         shell = TestShell(commands=[test_command])
-        self.assertEqual(22, shell.run_cli_line("test_shell bleh_command --arg a b"))
-        self.assertEqual(22, shell.run_interactive_line('bleh_command arg=["a","b"]'))
-        self.assertEqual(22, shell.run_interactive_line("bleh_command arg=[a, b]"))
+        self.assertEqual(
+            22, await shell.run_cli_line("test_shell bleh_command --arg a b")
+        )
+        self.assertEqual(
+            22, await shell.run_interactive_line('bleh_command arg=["a","b"]')
+        )
+        self.assertEqual(
+            22, await shell.run_interactive_line("bleh_command arg=[a, b]")
+        )
 
-    def test_command_aliases_spec(self):
+    async def test_command_async(self):
+        @command
+        @argument("arg", description="argument help", aliases=["i"])
+        async def test_command(arg: List[str]) -> int:
+            """
+            Sample Docstring
+            """
+            self.assertEqual(["a", "b"], arg)
+            cprint(arg, "green")
+            return 22
+
+        shell = TestShell(commands=[test_command])
+        self.assertEqual(
+            22, await shell.run_cli_line("test_shell test-command --arg a b")
+        )
+        self.assertEqual(
+            22, await shell.run_interactive_line('test-command arg=["a","b"]')
+        )
+
+    async def test_command_aliases_spec(self):
         """
         Testing aliases
         """
 
         @command("bleh_command", aliases=["bleh"])
         @argument("arg", description="argument help", aliases=["i"])
-        def test_command(arg: List[str]) -> int:
+        async def test_command(arg: List[str]) -> int:
             """
             Sample Docstring
             """
@@ -70,16 +114,16 @@ class CommandSpecTest(unittest.TestCase):
             return 22
 
         shell = TestShell(commands=[test_command])
-        self.assertEqual(22, shell.run_cli_line("test_shell bleh -i a b"))
+        self.assertEqual(22, await shell.run_cli_line("test_shell bleh -i a b"))
 
-    def test_command_find_approx_spec(self):
+    async def test_command_find_approx_spec(self):
         """
         Testing approximate command / subcommand typing
         """
 
         @command("command_first", aliases=["first"])
         @argument("arg", description="argument help", aliases=["i"])
-        def test_command_1(arg: int = 22) -> int:
+        async def test_command_1(arg: int = 22) -> int:
             """
             Sample Docstring
             """
@@ -88,7 +132,7 @@ class CommandSpecTest(unittest.TestCase):
 
         @command("command_second", aliases=["second"])
         @argument("arg", description="argument help", aliases=["i"])
-        def test_command_2(arg: int = 23) -> int:
+        async def test_command_2(arg: int = 23) -> int:
             """
             Sample Docstring
             """
@@ -98,31 +142,31 @@ class CommandSpecTest(unittest.TestCase):
         shell = TestShell(commands=[test_command_1, test_command_2])
 
         # correct command name
-        self.assertEqual(22, shell.run_interactive_line("first"))
+        self.assertEqual(22, await shell.run_interactive_line("first"))
         # unique prefix command name
-        self.assertEqual(22, shell.run_interactive_line("f"))
+        self.assertEqual(22, await shell.run_interactive_line("f"))
         # unique levenshtein command name
-        self.assertEqual(22, shell.run_interactive_line("firts"))
+        self.assertEqual(22, await shell.run_interactive_line("firts"))
         # unique prefix + levenshtein command name
-        self.assertEqual(22, shell.run_interactive_line("firs"))
+        self.assertEqual(22, await shell.run_interactive_line("firs"))
         # non-unique prefix command name
-        self.assertEqual(None, shell.run_interactive_line("command"))
+        self.assertEqual(None, await shell.run_interactive_line("command"))
 
         # approximate matching only works for interactive mode, not CLI
-        self.assertEqual(22, shell.run_cli_line("test_shell first"))
+        self.assertEqual(22, await shell.run_cli_line("test_shell first"))
         with self.assertRaises(SystemExit):
-            shell.run_cli_line("test_shell f")
+            await shell.run_cli_line("test_shell f")
         with self.assertRaises(SystemExit):
-            shell.run_cli_line("test_shell firts")
+            await shell.run_cli_line("test_shell firts")
         with self.assertRaises(SystemExit):
-            shell.run_cli_line("test_shell firs")
+            await shell.run_cli_line("test_shell firs")
         with self.assertRaises(SystemExit):
-            shell.run_cli_line("test_shell command")
+            await shell.run_cli_line("test_shell command")
 
-    def test_no_type_works_the_same(self):
+    async def test_no_type_works_the_same(self):
         @command
         @argument("arg", positional=True)
-        def test_command(arg: str) -> int:
+        async def test_command(arg: str) -> int:
             """
             Sample Docstring
             """
@@ -131,13 +175,13 @@ class CommandSpecTest(unittest.TestCase):
             return 64 + int(arg)
 
         shell = TestShell(commands=[test_command])
-        self.assertEqual(65, shell.run_cli_line("test_shell test-command 1"))
-        self.assertEqual(65, shell.run_interactive_line("test-command 1"))
-        self.assertEqual(65, shell.run_interactive_line('test-command "1"'))
+        self.assertEqual(65, await shell.run_cli_line("test_shell test-command 1"))
+        self.assertEqual(65, await shell.run_interactive_line("test-command 1"))
+        self.assertEqual(65, await shell.run_interactive_line('test-command "1"'))
 
         @command
         @argument("arg")
-        def test_command(arg: str) -> int:
+        async def test_command(arg: str) -> int:
             """
             Sample Docstring
             """
@@ -146,16 +190,24 @@ class CommandSpecTest(unittest.TestCase):
             return 64 + int(arg)
 
         shell = TestShell(commands=[test_command])
-        self.assertEqual(65, shell.run_cli_line("test_shell test-command --arg 1"))
-        self.assertEqual(65, shell.run_interactive_line("test-command arg=1"))
-        self.assertEqual(65, shell.run_interactive_line('test-command arg="1"'))
+        self.assertEqual(
+            65, await shell.run_cli_line("test_shell test-command --arg 1")
+        )
+        self.assertEqual(
+            65,
+            await shell.run_interactive_line("test-command arg=1"),
+        )
+        self.assertEqual(
+            65,
+            await shell.run_interactive_line('test-command arg="1"'),
+        )
 
-    def test_command_with_postional(self):
+    async def test_command_with_postional(self):
         @command
         @argument("arg1", positional=True)
         @argument("arg2", positional=True)
         @argument("arg3", positional=True)
-        def test_command(arg1: str, arg2: str, arg3: str) -> int:
+        async def test_command(arg1: str, arg2: str, arg3: str) -> int:
             """
             Sample Docstring
             """
@@ -168,13 +220,15 @@ class CommandSpecTest(unittest.TestCase):
             return 64 * int(arg1) + int(arg2)
 
         shell = TestShell(commands=[test_command])
-        self.assertEqual(66, shell.run_cli_line("test_shell test-command 1 2 nubia"))
-        self.assertEqual(66, shell.run_interactive_line("test-command 1 2 nubia"))
+        self.assertEqual(
+            66, await shell.run_cli_line("test_shell test-command 1 2 nubia")
+        )
+        self.assertEqual(66, await shell.run_interactive_line("test-command 1 2 nubia"))
 
-    def test_command_with_extra_spaces(self):
+    async def test_command_with_extra_spaces(self):
         @command
         @argument("arg1", positional=True)
-        def test_command(arg1: str) -> None:
+        async def test_command(arg1: str) -> None:
             """
             Sample Docstring
             """
@@ -183,20 +237,20 @@ class CommandSpecTest(unittest.TestCase):
             return True
 
         shell = TestShell(commands=[test_command])
-        self.assertTrue(shell.run_interactive_line("test-command 1"))
-        self.assertTrue(shell.run_interactive_line("test-command  1"))
-        self.assertTrue(shell.run_interactive_line("test-command   1"))
-        self.assertTrue(shell.run_interactive_line(" test-command 1"))
-        self.assertTrue(shell.run_interactive_line("  test-command 1"))
-        self.assertTrue(shell.run_interactive_line("test-command 1 "))
-        self.assertTrue(shell.run_interactive_line("test-command 1  "))
-        self.assertTrue(shell.run_interactive_line("  test-command  1  "))
+        self.assertTrue(await shell.run_interactive_line("test-command 1"))
+        self.assertTrue(await shell.run_interactive_line("test-command  1"))
+        self.assertTrue(await shell.run_interactive_line("test-command   1"))
+        self.assertTrue(await shell.run_interactive_line(" test-command 1"))
+        self.assertTrue(await shell.run_interactive_line("  test-command 1"))
+        self.assertTrue(await shell.run_interactive_line("test-command 1 "))
+        self.assertTrue(await shell.run_interactive_line("test-command 1  "))
+        self.assertTrue(await shell.run_interactive_line("  test-command  1  "))
 
-    def test_command_with_postional_and_named_arguments(self):
+    async def test_command_with_postional_and_named_arguments(self):
         @command
         @argument("arg2", positional=True)
         @argument("arg3", positional=True)
-        def test_command(arg1: str, arg2: str, arg3: str) -> int:
+        async def test_command(arg1: str, arg2: str, arg3: str) -> int:
             """
             Sample Docstring
             """
@@ -210,57 +264,71 @@ class CommandSpecTest(unittest.TestCase):
 
         shell = TestShell(commands=[test_command])
         self.assertEqual(
-            66, shell.run_cli_line("test_shell test-command --arg1=1 2 nubia")
+            66, await shell.run_cli_line("test_shell test-command --arg1=1 2 nubia")
         )
-        self.assertEqual(66, shell.run_interactive_line("test-command arg1=1 2 nubia"))
         self.assertEqual(
-            66, shell.run_interactive_line("test-command arg1=1 arg2=2 nubia")
+            66, await shell.run_interactive_line("test-command arg1=1 2 nubia")
+        )
+        self.assertEqual(
+            66, await shell.run_interactive_line("test-command arg1=1 arg2=2 nubia")
         )
         # Fails parsing because positionals have to be at the end
-        self.assertEqual(1, shell.run_interactive_line("test-command 2 nubia arg1=1"))
+        self.assertEqual(
+            1, await shell.run_interactive_line("test-command 2 nubia arg1=1")
+        )
 
-    def test_command_with_mutex_groups(self):
+    async def test_command_with_mutex_groups(self):
         @command(exclusive_arguments=["arg1", "arg2"])
         @argument("arg1")
         @argument("arg2")
-        def test_command(arg1: str = "0", arg2: str = "0") -> int:
+        async def test_command(arg1: str = "0", arg2: str = "0") -> int:
             """
             Sample Docstring
             """
             return 64 * int(arg1) + int(arg2)
 
         shell = TestShell(commands=[test_command])
-        self.assertEqual(64, shell.run_cli_line("test_shell test-command --arg1 1"))
-        self.assertEqual(64, shell.run_interactive_line("test-command arg1=1"))
+        self.assertEqual(
+            64, await shell.run_cli_line("test_shell test-command --arg1 1")
+        )
+        self.assertEqual(
+            64,
+            await shell.run_interactive_line("test-command arg1=1"),
+        )
 
-        self.assertEqual(2, shell.run_cli_line("test_shell test-command --arg2 2"))
-        self.assertEqual(2, shell.run_interactive_line("test-command arg2=2"))
+        self.assertEqual(
+            2, await shell.run_cli_line("test_shell test-command --arg2 2")
+        )
+        self.assertEqual(
+            2,
+            await shell.run_interactive_line("test-command arg2=2"),
+        )
 
         with self.assertRaises(SystemExit):
-            shell.run_cli_line("test_shell test-command --arg1 1 --arg2 2")
+            await shell.run_cli_line("test_shell test-command --arg1 1 --arg2 2")
 
         self.assertEqual(
             66,
-            shell.run_interactive_line("test-command arg1=1 arg2=2"),
+            await shell.run_interactive_line("test-command arg1=1 arg2=2"),
             "We are not enforsing mutex groups on interactive",
         )
 
-    def test_command_with_mutex_groups_two_positionals(self):
+    async def test_command_with_mutex_groups_two_positionals(self):
         msg = "We don't supporting mutex group with required arguments"
         with self.assertRaises(ValueError, msg=msg):
 
             @command(exclusive_arguments=["arg1", "arg2"])
             @argument("arg1", positional=True)
             @argument("arg2")
-            def test_command(arg1: str, arg2: str = "lalala") -> int:
+            async def test_command(arg1: str, arg2: str = "lalala") -> int:
                 """
                 Sample Docstring
                 """
                 return -1
 
-            TestShell(commands=[test_command])
+            await TestShell(commands=[test_command]).run_async()
 
-    def test_command_default_argument(self):
+    async def test_command_default_argument(self):
         """
         Tests that calling a command from the CLI without all arguments
         specified will fall back to the default arguments set in the command
@@ -269,7 +337,7 @@ class CommandSpecTest(unittest.TestCase):
 
         @command
         @argument("arg", description="argument help", aliases=["i"])
-        def test_command(arg: int = 22) -> int:
+        async def test_command(arg: int = 22) -> int:
             """
             Sample Docstring
             """
@@ -277,17 +345,17 @@ class CommandSpecTest(unittest.TestCase):
             return arg
 
         shell = TestShell(commands=[test_command])
-        self.assertEqual(22, shell.run_cli_line("test_shell test-command"))
-        self.assertEqual(22, shell.run_interactive_line("test-command"))
+        self.assertEqual(22, await shell.run_cli_line("test_shell test-command"))
+        self.assertEqual(22, await shell.run_interactive_line("test-command"))
 
-    def test_command_optional_argument(self):
+    async def test_command_optional_argument(self):
         """
         Same as above but check for make the argument optional in Python sense.
         """
 
         @command
         @argument("arg", description="argument help", aliases=["i"])
-        def test_command(arg: Optional[List[str]] = None) -> int:
+        async def test_command(arg: Optional[List[str]] = None) -> int:
             """
             Sample Docstring
             """
@@ -296,12 +364,15 @@ class CommandSpecTest(unittest.TestCase):
             return sum(int(x) for x in arg)
 
         shell = TestShell(commands=[test_command])
-        self.assertEqual(42, shell.run_cli_line("test_shell test-command"))
-        self.assertEqual(42, shell.run_interactive_line("test-command"))
-        self.assertEqual(0, shell.run_cli_line("test_shell test-command --arg 0"))
-        self.assertEqual(0, shell.run_interactive_line("test-command arg=[0]"))
+        self.assertEqual(42, await shell.run_cli_line("test_shell test-command"))
+        self.assertEqual(42, await shell.run_interactive_line("test-command"))
+        self.assertEqual(0, await shell.run_cli_line("test_shell test-command --arg 0"))
+        self.assertEqual(
+            0,
+            await shell.run_interactive_line("test-command arg=[0]"),
+        )
 
-    def test_command_one_required_one_default_argument(self):
+    async def test_command_one_required_one_default_argument(self):
         """
         Tests that calling a command from the CLI without all arguments
         specified will fall back to the default arguments set in the command
@@ -311,7 +382,7 @@ class CommandSpecTest(unittest.TestCase):
         @command("bleh_command")
         @argument("arg1", description="argument help", aliases=["i1"])
         @argument("arg2", description="argument 2 help", aliases=["i2"])
-        def test_command(arg1: int, arg2: int = 1) -> int:
+        async def test_command(arg1: int, arg2: int = 1) -> int:
             """
             Sample Docstring
             """
@@ -319,12 +390,17 @@ class CommandSpecTest(unittest.TestCase):
             return arg1 + arg2
 
         shell = TestShell(commands=[test_command])
-        self.assertEqual(22, shell.run_cli_line("test_shell bleh_command --arg1=21"))
-        self.assertEqual(22, shell.run_interactive_line("bleh_command arg1=21"))
+        self.assertEqual(
+            22, await shell.run_cli_line("test_shell bleh_command --arg1=21")
+        )
+        self.assertEqual(
+            22,
+            await shell.run_interactive_line("bleh_command arg1=21"),
+        )
 
-    def test_command_for_blacklist_plugin_allowed(self):
+    async def test_command_for_blacklist_plugin_allowed(self):
         @command("allowed")
-        def test_command():
+        async def test_command():
             """
             Sample Docstring
             """
@@ -332,12 +408,12 @@ class CommandSpecTest(unittest.TestCase):
             return 42
 
         shell = TestShell(commands=[test_command])
-        self.assertEqual(42, shell.run_cli_line("test_shell allowed"))
-        self.assertEqual(42, shell.run_interactive_line("allowed"))
+        self.assertEqual(42, await shell.run_cli_line("test_shell allowed"))
+        self.assertEqual(42, await shell.run_interactive_line("allowed"))
 
-    def test_command_for_blacklist_plugin_blacklisted(self):
+    async def test_command_for_blacklist_plugin_blacklisted(self):
         @command("blocked")
-        def test_command():
+        async def test_command():
             """
             Sample Docstring
             """
@@ -345,13 +421,13 @@ class CommandSpecTest(unittest.TestCase):
             return 3
 
         shell = TestShell(commands=[test_command])
-        self.assertEqual(1, shell.run_cli_line("test_shell blocked"))
-        self.assertEqual(1, shell.run_interactive_line("blocked"))
+        self.assertEqual(1, await shell.run_cli_line("test_shell blocked"))
+        self.assertEqual(1, await shell.run_interactive_line("blocked"))
 
-    def test_command_with_negative_ints(self):
+    async def test_command_with_negative_ints(self):
         @command("minus_command")
         @argument("arg1", type=int)
-        def test_command(arg1):
+        async def test_command(arg1):
             """
             Sample Docstring
             """
@@ -360,14 +436,16 @@ class CommandSpecTest(unittest.TestCase):
 
         shell = TestShell(commands=[test_command])
         # Cli run
-        self.assertEqual(42, shell.run_cli_line("test_shell minus_command --arg1=-1"))
+        self.assertEqual(
+            42, await shell.run_cli_line("test_shell minus_command --arg1=-1")
+        )
         # Interactive
-        self.assertEqual(42, shell.run_interactive_line("minus_command arg1=-1"))
+        self.assertEqual(42, await shell.run_interactive_line("minus_command arg1=-1"))
 
-    def test_command_with_negative_floats(self):
+    async def test_command_with_negative_floats(self):
         @command("minus_command")
         @argument("arg1", type=float)
-        def test_command(arg1):
+        async def test_command(arg1):
             """
             Sample Docstring
             """
@@ -376,13 +454,19 @@ class CommandSpecTest(unittest.TestCase):
 
         shell = TestShell(commands=[test_command])
         # Cli run
-        self.assertEqual(42, shell.run_cli_line("test_shell minus_command --arg1=-1"))
-        self.assertEqual(42, shell.run_cli_line("test_shell minus_command --arg1=-1.0"))
+        self.assertEqual(
+            42, await shell.run_cli_line("test_shell minus_command --arg1=-1")
+        )
+        self.assertEqual(
+            42, await shell.run_cli_line("test_shell minus_command --arg1=-1.0")
+        )
         # Interactive
-        self.assertEqual(42, shell.run_interactive_line("minus_command arg1=-1"))
-        self.assertEqual(42, shell.run_interactive_line("minus_command arg1=-1.0"))
+        self.assertEqual(42, await shell.run_interactive_line("minus_command arg1=-1"))
+        self.assertEqual(
+            42, await shell.run_interactive_line("minus_command arg1=-1.0")
+        )
 
-    def test_command_deprecation(self):
+    async def test_command_deprecation(self):
         @deprecated(superseded_by="new-command")
         @command
         def old_command() -> int:
@@ -401,15 +485,15 @@ class CommandSpecTest(unittest.TestCase):
             return 42
 
         shell = TestShell(commands=[old_command, new_command])
-        self.assertEqual(42, shell.run_cli_line("test_shell old-command"))
-        self.assertEqual(42, shell.run_interactive_line("old-command"))
-        self.assertEqual(42, shell.run_cli_line("test_shell new-command"))
-        self.assertEqual(42, shell.run_interactive_line("new-command"))
+        self.assertEqual(42, await shell.run_cli_line("test_shell old-command"))
+        self.assertEqual(42, await shell.run_interactive_line("old-command"))
+        self.assertEqual(42, await shell.run_cli_line("test_shell new-command"))
+        self.assertEqual(42, await shell.run_interactive_line("new-command"))
 
-    def test_type_lifting(self):
+    async def test_type_lifting(self):
         @command
         @argument("args")
-        def test_command(args: List[str]) -> str:
+        async def test_command(args: List[str]) -> str:
             """
             Sample Docstring
             """
@@ -417,13 +501,17 @@ class CommandSpecTest(unittest.TestCase):
 
         shell = TestShell(commands=[test_command])
         # CLI
-        self.assertEqual("a", shell.run_cli_line("test_shell test-command --args a"))
         self.assertEqual(
-            "a|b", shell.run_cli_line("test_shell test-command --args a b")
+            "a", await shell.run_cli_line("test_shell test-command --args a")
+        )
+        self.assertEqual(
+            "a|b", await shell.run_cli_line("test_shell test-command --args a b")
         )
         # Interactive
-        self.assertEqual("a", shell.run_interactive_line('test-command args="a"'))
-        self.assertEqual("a", shell.run_interactive_line('test-command args=["a"]'))
+        self.assertEqual("a", await shell.run_interactive_line('test-command args="a"'))
         self.assertEqual(
-            "a|b", shell.run_interactive_line('test-command args=["a", "b"]')
+            "a", await shell.run_interactive_line('test-command args=["a"]')
+        )
+        self.assertEqual(
+            "a|b", await shell.run_interactive_line('test-command args=["a", "b"]')
         )

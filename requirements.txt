@@ -1,6 +1,6 @@
 jellyfish
 prettytable
-prompt-toolkit>=2
+prompt-toolkit>=3
 Pygments
 pyparsing>=2.2.0,<3
 termcolor
