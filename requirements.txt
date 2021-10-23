@@ -1,4 +1,4 @@
-dataclasses;python_version<'3.7'
+dataclasses
 jellyfish
 prettytable
 prompt-toolkit>=2
