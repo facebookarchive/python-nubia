@@ -1,4 +1,3 @@
-dataclasses
 jellyfish
 prettytable
 prompt-toolkit>=2
