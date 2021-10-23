@@ -54,7 +54,7 @@ setuptools.setup(
     packages=setuptools.find_packages(exclude=["sample", "docs", "tests"]),
     python_requires=">=3.7",
     setup_requires=["nose>=1.0", "coverage"],
-    tests_require=["nose>=1.0", "dataclasses"],
+    tests_require=["nose>=1.0"],
     entry_points={"console_scripts": ["_nubia_complete = nubia_complete.main:main"]},
     install_requires=reqs,
     classifiers=(

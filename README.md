@@ -108,11 +108,6 @@ From within the virtualenv you can use nosetests:
 nosetests
 ```
 
-Or if you don't want to create a virtualenv, just use:
-```bash
-python3 setup.py nosetests
-```
-
 ## Getting Started
 
 See the [getting started](GETTING_STARTED.md) guide to learn how to build a simple application with Nubia.

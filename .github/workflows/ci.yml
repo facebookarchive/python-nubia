@@ -21,4 +21,4 @@ jobs:
         if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
     - name: Test with nosetests
       run: |
-        python setup.py nosetests --with-coverage --cover-package=nubia
+        nosetests --with-coverage --cover-package=nubia
