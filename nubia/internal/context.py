@@ -8,14 +8,15 @@
 #
 
 import copy
-import sys
-import os
 import getpass
+import os
+import sys
+from threading import RLock
+from typing import Any, List, Tuple
+
+from pygments.token import Token
 
 from nubia.internal.io.eventbus import Listener
-from threading import RLock
-from pygments.token import Token
-from typing import List, Tuple, Any
 
 
 class Context(Listener):

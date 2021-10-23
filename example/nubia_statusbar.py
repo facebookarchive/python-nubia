@@ -9,8 +9,7 @@
 
 from pygments.token import Token
 
-from nubia import context
-from nubia import statusbar
+from nubia import context, statusbar
 
 
 class NubiaExampleStatusBar(statusbar.StatusBar):

@@ -10,8 +10,10 @@
 import asyncio
 import socket
 import typing
+
 from termcolor import cprint
-from nubia import command, argument, context
+
+from nubia import argument, command, context
 
 
 @command(aliases=["lookup"])

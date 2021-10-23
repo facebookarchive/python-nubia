@@ -9,9 +9,9 @@
 
 import sys
 
-from nubia.internal.ui.ipython import NubiaPrompt
 from traitlets.config.loader import Config
 
+from nubia.internal.ui.ipython import NubiaPrompt
 
 try:
     from IPython.terminal.embed import InteractiveShellEmbed

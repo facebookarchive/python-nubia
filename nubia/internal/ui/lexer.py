@@ -8,19 +8,12 @@
 #
 
 import re
+
 from pygments.lexer import RegexLexer, bygroups
-from pygments.token import (
-    Punctuation,
-    Text,
-    Operator,
-    Keyword,
-    Name,
-    String,
-    Number,
-)
+from pygments.token import Keyword, Name, Number, Operator, Punctuation, String, Text
+
 from nubia import context
 from nubia.internal import parser
-
 
 _identifier = r"[a-zA-Z_][a-zA-Z0-9_\-]*"
 _unquoted_string = "([a-zA-Z0-9{}]+)".format(

@@ -13,7 +13,7 @@ import typing
 import unittest
 from io import StringIO
 
-from nubia.internal.typing import command, argument
+from nubia.internal.typing import argument, command
 from nubia.internal.typing.argparse import add_command, find_command
 from nubia.internal.typing.builder import build_value
 

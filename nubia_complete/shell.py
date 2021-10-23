@@ -7,9 +7,9 @@
 # LICENSE file in the root directory of this source tree.
 #
 
-import sys
-import string
 import re
+import string
+import sys
 
 regex = re.compile("[{}]".format(re.escape(string.punctuation)))
 

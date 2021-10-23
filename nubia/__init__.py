@@ -7,17 +7,15 @@
 # LICENSE file in the root directory of this source tree.
 #
 
-from .internal import context
-from .internal import exceptions
+from .internal import context, exceptions
 from .internal.deprecation import deprecated
 from .internal.io import eventbus
 from .internal.io.session_logger import SessionLogger
-from .internal.ui import statusbar
 from .internal.nubia import Nubia
 from .internal.options import Options
-from .internal.plugin_interface import PluginInterface, CompletionDataSource
-from .internal.typing import argument
-from .internal.typing import command
+from .internal.plugin_interface import CompletionDataSource, PluginInterface
+from .internal.typing import argument, command
+from .internal.ui import statusbar
 
 name = "nubia"
 

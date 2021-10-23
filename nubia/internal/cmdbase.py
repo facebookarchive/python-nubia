@@ -16,6 +16,10 @@ from collections import OrderedDict
 from textwrap import dedent
 from typing import Iterable, Optional
 
+from prompt_toolkit.completion import CompleteEvent, Completion, WordCompleter
+from prompt_toolkit.document import Document
+from termcolor import cprint
+
 from nubia.internal import parser
 from nubia.internal.completion import AutoCommandCompletion
 from nubia.internal.exceptions import CommandParseError
@@ -29,9 +33,6 @@ from nubia.internal.typing.argparse import (
 )
 from nubia.internal.typing.builder import apply_typing
 from nubia.internal.typing.inspect import is_list_type
-from prompt_toolkit.completion import CompleteEvent, Completion, WordCompleter
-from prompt_toolkit.document import Document
-from termcolor import cprint
 
 from . import context
 

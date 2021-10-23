@@ -25,12 +25,8 @@ class Listener:
             except NotImplementedError:
                 raise
             except Exception as e:
-                logger.info(
-                    "Couldn't initialize {}: " "{}".format(type(self), e)
-                )
+                logger.info("Couldn't initialize {}: {}".format(type(self), e))
                 traceback.print_exc()
 
     def on_connected(*args, **kwargs):
-        raise NotImplementedError(
-            "Listeners must implement on_connected method"
-        )
+        raise NotImplementedError("Listeners must implement on_connected method")

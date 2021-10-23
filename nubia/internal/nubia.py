@@ -16,22 +16,20 @@ import sys
 import tempfile
 import traceback
 import typing
+
 from termcolor import cprint
 
-from nubia.internal import context
-from nubia.internal import exceptions
-from nubia.internal.options import Options
-from nubia.internal.typing.argparse import create_subparser_class
+from nubia.internal import cmdloader, context, exceptions
 from nubia.internal.blackcmd import CommandBlacklist
 from nubia.internal.cmdbase import AutoCommand
-from nubia.internal import cmdloader
-from nubia.internal.commands import builtin
-from nubia.internal.commands import help
+from nubia.internal.commands import builtin, help
 from nubia.internal.helpers import catchall
 from nubia.internal.interactive import IOLoop
 from nubia.internal.io import logger
+from nubia.internal.options import Options
 from nubia.internal.plugin_interface import PluginInterface
 from nubia.internal.registry import CommandsRegistry
+from nubia.internal.typing.argparse import create_subparser_class
 from nubia.internal.usage_logger_interface import UsageLoggerInterface
 
 

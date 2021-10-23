@@ -7,16 +7,16 @@
 # LICENSE file in the root directory of this source tree.
 #
 
-import logging
 import itertools
-import pyparsing as pp
-from nubia.internal.helpers import function_to_str
+import logging
+from typing import TYPE_CHECKING, Iterable
 
-from typing import Iterable, TYPE_CHECKING
-from nubia.internal import parser
+import pyparsing as pp
+from prompt_toolkit.completion import CompleteEvent, Completion
 from prompt_toolkit.document import Document
-from prompt_toolkit.completion import CompleteEvent
-from prompt_toolkit.completion import Completion
+
+from nubia.internal import parser
+from nubia.internal.helpers import function_to_str
 
 if TYPE_CHECKING:
     from nubia.internal.cmdbase import AutoCommand  # noqa
@@ -142,9 +142,7 @@ class AutoCommandCompletion:
         if self.doc.char_before_cursor in " ]}":
             last_token = ""
         else:
-            last_space = (
-                self.doc.find_backwards(" ", in_current_line=True) or -1
-            )
+            last_space = self.doc.find_backwards(" ", in_current_line=True) or -1
             last_token = self.doc.text[(last_space + 1) :]  # noqa
         # We pick the bigger match here. The reason we want to look into
         # remaining is to capture the state that we are in an open list,
@@ -212,9 +210,7 @@ class AutoCommandCompletion:
                     start_position=-len(parsed_token.last_value),
                 )
                 for choice in arg.choices
-                if str(choice)
-                .lower()
-                .startswith(parsed_token.last_value.lower())
+                if str(choice).lower().startswith(parsed_token.last_value.lower())
             ]
         # We are completing arguments, or positionals.
         # TODO: We would like to only show positional choices if we exhaust all
@@ -236,9 +232,7 @@ class AutoCommandCompletion:
         arguments = arguments or self.meta.arguments.values()
         if prefix:
             return [
-                arg_meta
-                for arg_meta in arguments
-                if arg_meta.name.startswith(prefix)
+                arg_meta for arg_meta in arguments if arg_meta.name.startswith(prefix)
             ]
         return arguments
 

@@ -10,6 +10,7 @@
 import unittest
 
 from nubia import command
+
 from tests.util import TestShell
 
 
@@ -37,13 +38,13 @@ class SuperCommandSpecTest(unittest.TestCase):
         self.assertEqual(
             45,
             shell.run_cli_line(
-                "test_shell super-command sub-command " "--arg1=giza --arg2=22"
+                "test_shell super-command sub-command --arg1=giza --arg2=22"
             ),
         )
         self.assertEqual(
             22,
             shell.run_cli_line(
-                "test_shell super-command another-command " "--arg1=giza"
+                "test_shell super-command another-command --arg1=giza"
             ),
         )
 
@@ -93,7 +94,4 @@ class SuperCommandSpecTest(unittest.TestCase):
         shell = TestShell(commands=[SuperCommand])
 
         with self.assertRaises(SystemExit):
-            shell.run_cli_line(
-                "test_shell super-command "
-                "sub-command --arg1=human"
-            )
+            shell.run_cli_line("test_shell super-command sub-command --arg1=human")

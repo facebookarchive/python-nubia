@@ -11,7 +11,6 @@ import ast
 import re
 import sys
 import typing
-
 from functools import wraps
 
 from nubia.internal.helpers import issubclass_
@@ -26,11 +25,7 @@ from nubia.internal.typing.inspect import (
 
 
 def build_value(string, tp=None, python_syntax=False):
-    value = (
-        _safe_eval(string)
-        if python_syntax
-        else _build_simple_value(string, tp)
-    )
+    value = _safe_eval(string) if python_syntax else _build_simple_value(string, tp)
     if tp:
         value = apply_typing(value, tp)
     return value
@@ -91,7 +86,7 @@ def get_typing_function(tp):
             raise ValueError(
                 "Cannot resolve typing function for TypeVar({constraints}) "
                 "as it declares multiple types".format(
-                    constraints=', '.join(
+                    constraints=", ".join(
                         getattr(c, "_name", c.__name__) for c in tp.__constraints__
                     )
                 )
@@ -111,9 +106,7 @@ def get_typing_function(tp):
     elif callable(tp):
         func = tp
     else:
-        raise ValueError(
-            'Cannot find a function to apply type "{}"'.format(tp)
-        )
+        raise ValueError('Cannot find a function to apply type "{}"'.format(tp))
 
     args = getattr(tp, "__args__", None)
 
@@ -144,8 +137,7 @@ def _build_simple_value(string, tp):
         return string
     elif is_mapping_type(tp):
         entries = (
-            re.split(r"\s*[:=]\s*", entry, maxsplit=1)
-            for entry in string.split(";")
+            re.split(r"\s*[:=]\s*", entry, maxsplit=1) for entry in string.split(";")
         )
         if is_dict_value_iterable(tp):
             entries = ((k, re.split(r"\s*,\s*", v)) for k, v in entries)

@@ -14,7 +14,6 @@ from argparse import _SubParsersAction
 from nubia.internal.typing import Command, FunctionInspection
 from nubia.internal.typing.argparse import transform_argument_name
 
-
 logger = logging.getLogger(__name__)
 
 

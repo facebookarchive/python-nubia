@@ -7,9 +7,7 @@
 # LICENSE file in the root directory of this source tree.
 #
 
-from nubia import context
-from nubia import exceptions
-from nubia import eventbus
+from nubia import context, eventbus, exceptions
 
 
 class NubiaExampleContext(context.Context):

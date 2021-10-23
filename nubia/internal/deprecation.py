@@ -15,9 +15,7 @@ from termcolor import cprint
 from nubia.internal.typing import inspect_object
 
 
-def deprecated(
-    message: Optional[str] = None, superseded_by: Optional[str] = None
-):
+def deprecated(message: Optional[str] = None, superseded_by: Optional[str] = None):
     def decorator(command):
         @wraps(command)
         def wrapper(*args: Any, **kwargs: Dict[str, Any]):
@@ -31,9 +29,7 @@ def deprecated(
             if message is not None:
                 cprint(message, "yellow")
             elif superseded_by is not None:
-                cprint(
-                    "Use `{}` command instead".format(superseded_by), "yellow"
-                )
+                cprint("Use `{}` command instead".format(superseded_by), "yellow")
             else:
                 assert False, "Unreachable"
             return command(*args, **kwargs)

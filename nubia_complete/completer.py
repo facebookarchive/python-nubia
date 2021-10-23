@@ -7,12 +7,12 @@
 # LICENSE file in the root directory of this source tree.
 #
 
+import json
 import logging
 import os
 import re
-import json
-import string
 import shlex
+import string
 
 logger = logging.getLogger(__name__)
 
@@ -46,9 +46,7 @@ def run_complete(args):
         # drop the first word (the executable name)
         tokens = tokens[1:]
     except ValueError:
-        logger.warning(
-            "We are in an open quotations, cannot suggestion completions"
-        )
+        logger.warning("We are in an open quotations, cannot suggestion completions")
         return 0
     logger.debug("COMP_LINE: @%s@", comp_line)
     logger.debug("COMP_POINT: %s", comp_point)
@@ -79,9 +77,7 @@ def _drop_from_options(options, token, skip_value=False):
         tokens = tokens[:1]
     for i, option in enumerate(options):
         logger.debug("Tokens: %s", tokens)
-        if tokens[0] == option.get("name") or tokens[0] in option.get(
-            "extra_names"
-        ):
+        if tokens[0] == option.get("name") or tokens[0] in option.get("extra_names"):
             logger.debug("Dropping option %s", option)
             if option.get("expects_argument"):
                 if len(tokens) > 1:
@@ -139,8 +135,7 @@ def get_completions(model, tokens, current, shell):
                     break
             else:
                 logger.debug(
-                    "We didn't find any matching command, ignoring the"
-                    "token %s",
+                    "We didn't find any matching command, ignoring the token %s",
                     token,
                 )
                 # Now that we know where we are, let's complete the current token:
@@ -156,9 +151,7 @@ def get_completions(model, tokens, current, shell):
                 key = match.groupdict()["key"]
                 logger.debug("We are in a value-completion inside %s", key)
                 # it's true
-                option = _drop_from_options(
-                    options_we_expect, current, skip_value=True
-                )
+                option = _drop_from_options(options_we_expect, current, skip_value=True)
                 if option:
                     # YES, we have it, let's get the values
                     prefix = ""
