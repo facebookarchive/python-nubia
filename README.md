@@ -70,7 +70,7 @@ def lookup(hosts: typing.List[str], bad_name: int) -> int:
 
 ## Requirements
 
-Nubia-based applications require python 3.6+ and works with both Mac OS X or Linux. While in theory it should work on Windows, it has never been tried.
+Nubia-based applications require python 3.7+ and works with both Mac OS X or Linux. While in theory it should work on Windows, it has never been tried.
 
 ## Installing Nubia
 
@@ -106,11 +106,6 @@ To run the unit tests:
 From within the virtualenv you can use nosetests:
 ```bash
 nosetests
-```
-
-Or if you don't want to create a virtualenv, just use:
-```bash
-python3 setup.py nosetests
 ```
 
 ## Getting Started

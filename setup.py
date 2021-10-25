@@ -9,15 +9,14 @@
 
 import ast
 import re
-import setuptools
 import sys
-
-
 # To use a consistent encoding
 from codecs import open
 from os import path
 
-assert sys.version_info >= (3, 6, 0), "python-nubia requires Python 3.6+"
+import setuptools
+
+assert sys.version_info >= (3, 7, 0), "python-nubia requires Python 3.7+"
 from pathlib import Path  # noqa E402
 
 here = Path(__file__).parent
@@ -53,16 +52,16 @@ setuptools.setup(
     keywords="cli shell interactive framework",
     url="https://github.com/facebookincubator/python-nubia",
     packages=setuptools.find_packages(exclude=["sample", "docs", "tests"]),
-    python_requires=">=3.6",
+    python_requires=">=3.7",
     setup_requires=["nose>=1.0", "coverage"],
-    tests_require=["nose>=1.0", "dataclasses;python_version<'3.7'"],
+    tests_require=["nose>=1.0"],
     entry_points={"console_scripts": ["_nubia_complete = nubia_complete.main:main"]},
     install_requires=reqs,
     classifiers=(
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
         "Environment :: Console",
-        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3 :: Only",
         "Topic :: Software Development :: Libraries :: Python Modules",
         "License :: OSI Approved :: BSD License",

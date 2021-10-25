@@ -1,9 +1,8 @@
-dataclasses;python_version<'3.7'
 jellyfish
 prettytable
 prompt-toolkit>=2
 Pygments
-pyparsing>=2.2.0
+pyparsing>=2.2.0,<3
 termcolor
 typing-inspect
 wcwidth
