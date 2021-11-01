@@ -7,9 +7,10 @@
 # LICENSE file in the root directory of this source tree.
 #
 
-import sys
-import logging
 import argparse
+import logging
+import sys
+
 from nubia_complete.completer import run_complete
 from nubia_complete.shell import generate_shell_setup
 

@@ -11,11 +11,6 @@ import logging
 import os
 from typing import Any, List, Tuple
 
-from nubia.internal.helpers import catchall, find_approx, suggestions_msg
-from nubia.internal.io.eventbus import Listener
-from nubia.internal.options import Options
-from nubia.internal.ui.lexer import NubiaLexer
-from nubia.internal.ui.style import shell_style
 from prompt_toolkit import PromptSession
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from prompt_toolkit.completion import Completer
@@ -26,6 +21,12 @@ from prompt_toolkit.history import FileHistory, InMemoryHistory
 from prompt_toolkit.layout.processors import HighlightMatchingBracketProcessor
 from prompt_toolkit.lexers import PygmentsLexer
 from termcolor import cprint
+
+from nubia.internal.helpers import catchall, find_approx, suggestions_msg
+from nubia.internal.io.eventbus import Listener
+from nubia.internal.options import Options
+from nubia.internal.ui.lexer import NubiaLexer
+from nubia.internal.ui.style import shell_style
 
 
 def split_command(text):

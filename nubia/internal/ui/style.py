@@ -8,14 +8,13 @@
 #
 
 from prompt_toolkit.styles import (
+    Style,
     merge_styles,
     style_from_pygments_cls,
     style_from_pygments_dict,
 )
-from prompt_toolkit.styles import Style
 from pygments.styles.monokai import MonokaiStyle
-from pygments.token import Token, Name
-
+from pygments.token import Name, Token
 
 shell_style = merge_styles(
     [

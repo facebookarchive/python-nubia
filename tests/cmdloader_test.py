@@ -10,9 +10,7 @@
 import unittest
 
 from nubia.internal import cmdloader
-
-from tests import sample_package
-from tests import empty_package
+from tests import empty_package, sample_package
 
 
 class CommandLoaderTest(unittest.TestCase):

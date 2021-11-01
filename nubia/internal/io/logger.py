@@ -9,6 +9,7 @@
 
 import logging
 import threading
+
 from termcolor import colored
 
 
@@ -43,8 +44,7 @@ class ContextFilter(logging.Filter):
 
 def get_formatter():
     return logging.Formatter(
-        fmt="[%(asctime)-15s] [%(level)6s] [%(logger_name)s] "
-        "%(thread)s%(message)s"
+        fmt="[%(asctime)-15s] [%(level)6s] [%(logger_name)s] %(thread)s%(message)s"
     )
 
 

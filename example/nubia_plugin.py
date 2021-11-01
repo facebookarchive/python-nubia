@@ -8,9 +8,11 @@
 #
 
 import argparse
+
 from nubia_context import NubiaExampleContext
 from nubia_statusbar import NubiaExampleStatusBar
-from nubia import PluginInterface, CompletionDataSource
+
+from nubia import CompletionDataSource, PluginInterface
 from nubia.internal.blackcmd import CommandBlacklist
 
 

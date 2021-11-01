@@ -60,20 +60,14 @@ following example achieves the exact same result as the example above:
 """
 
 
-from collections import namedtuple, OrderedDict
+from collections import OrderedDict, namedtuple
 from collections.abc import Container
 from functools import partial
-from inspect import ismethod, isclass
+from inspect import isclass, ismethod
 
+from nubia.internal.helpers import (function_to_str, get_arg_spec,
+                                    transform_class_name, transform_name)
 from termcolor import cprint
-
-from nubia.internal.helpers import (
-    get_arg_spec,
-    function_to_str,
-    transform_name,
-    transform_class_name,
-)
-
 
 Argument = namedtuple(
     "Argument",
@@ -153,9 +147,7 @@ def argument(
         if current_type and type and current_type != type:
             raise TypeError(
                 "Argument {} in {} is both specified as {} "
-                "and {}".format(
-                    arg, function_to_str(function), current_type, type
-                )
+                "and {}".format(arg, function_to_str(function), current_type, type)
             )
 
         if arg in function.__arguments_decorator_specs:
@@ -172,9 +164,7 @@ def argument(
 
         # reject positional=True if we are applied over a class
         if isclass(function) and positional:
-            raise ValueError(
-                "Cannot set positional arguments for super " "commands"
-            )
+            raise ValueError("Cannot set positional arguments for super commands")
 
         # We use __annotations__ to allow the usage of python 3 typing
         function.__annotations__.setdefault(arg, type)
@@ -193,9 +183,7 @@ def argument(
     return decorator
 
 
-def command(
-    name_or_function=None, help=None, aliases=None, exclusive_arguments=None
-):
+def command(name_or_function=None, help=None, aliases=None, exclusive_arguments=None):
     """
     Annotation decorator to specify that a function or method is a command
     that should be exported by nubia
@@ -206,9 +194,7 @@ def command(
 
     def decorator(function, name=None):
         is_supercommand = isclass(name_or_function)
-        exclusive_arguments_ = _normalize_exclusive_arguments(
-            exclusive_arguments
-        )
+        exclusive_arguments_ = _normalize_exclusive_arguments(exclusive_arguments)
         _validate_exclusive_arguments(function, exclusive_arguments_)
 
         _init_attr(function, "__command", {})
@@ -274,9 +260,7 @@ def inspect_object(obj, accept_bound_methods=False):
         arg_idx_with_default = len(args) - len(argspec.defaults)
         default_value_set = bool(argspec.defaults and i >= arg_idx_with_default)
         default_value = (
-            argspec.defaults[i - arg_idx_with_default]
-            if default_value_set
-            else None
+            argspec.defaults[i - arg_idx_with_default] if default_value_set else None
         )
         # We will reject classes (super-commands) that has required arguments to
         # reduce complexity
@@ -284,9 +268,7 @@ def inspect_object(obj, accept_bound_methods=False):
             raise ValueError(
                 "Cannot accept super commands that has required "
                 "arguments with no default value "
-                "like '{}' in super-command '{}'".format(
-                    arg, result["command"].name
-                )
+                "like '{}' in super-command '{}'".format(arg, result["command"].name)
             )
         arg_decor_spec = arguments_decorator_specs.get(
             arg, _empty_arg_decorator_spec(arg)
@@ -336,11 +318,15 @@ def inspect_object(obj, accept_bound_methods=False):
             if metadata.command:
                 if not metadata.command.help:
                     cprint(
-                        (f"[WARNING] The sub-command {metadata.command.name} "
-                         "will not be loaded. "
-                         "Please provide a help message by either defining a "
-                         "docstring or filling the help argument in the "
-                         "@command annotation"), "red")
+                        (
+                            f"[WARNING] The sub-command {metadata.command.name} "
+                            "will not be loaded. "
+                            "Please provide a help message by either defining a "
+                            "docstring or filling the help argument in the "
+                            "@command annotation"
+                        ),
+                        "red",
+                    )
                     continue
 
                 result["subcommands"].append((attr, metadata))
@@ -364,8 +350,7 @@ def _normalize_exclusive_arguments(exclusive_arguments):
 
     def all_container_items(items):
         return all(
-            isinstance(item, Container) and not isinstance(item, str)
-            for item in items
+            isinstance(item, Container) and not isinstance(item, str) for item in items
         )
 
     if not exclusive_arguments:
@@ -412,9 +397,7 @@ def _validate_exclusive_arguments(function, normalized_exclusive_arguments):
 
     if len(set(flat_ex_args)) != len(flat_ex_args):
         counts = (
-            (item, group.count(item))
-            for group in exclusive_arguments
-            for item in group
+            (item, group.count(item)) for group in exclusive_arguments for item in group
         )
         repeated_args = [item for item, count in counts if count > 1]
         msg = (

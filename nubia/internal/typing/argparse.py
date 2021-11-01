@@ -106,13 +106,9 @@ def register_command(argparse_parser, inspection):
     # Exclusive arguments needs to be added to argparse's mutually exclusive
     # groups
     exclusive_args = _command.exclusive_arguments or []
-    mutually_exclusive_groups = defaultdict(
-        subparser.add_mutually_exclusive_group
-    )
+    mutually_exclusive_groups = defaultdict(subparser.add_mutually_exclusive_group)
     for arg in inspection.arguments.values():
-        add_argument_args, add_argument_kwargs = _argument_to_argparse_input(
-            arg
-        )
+        add_argument_args, add_argument_kwargs = _argument_to_argparse_input(arg)
         groups = [group for group in exclusive_args if arg.name in group]
 
         if not groups:
@@ -160,9 +156,7 @@ def _resolve_subparsers(parser):
         if getattr(parser, "_subparsers", None):
             subparsers = parser._subparsers._actions[-1]
         else:
-            subparsers = parser.add_subparsers(
-                dest="_cmd", help="Subcommand to run"
-            )
+            subparsers = parser.add_subparsers(dest="_cmd", help="Subcommand to run")
     else:
         raise ValueError(
             "Expected an argparse.ArgumentParser or an "
@@ -269,9 +263,7 @@ def get_arguments_for_inspection(inspection, kwargs):
 
     # disconsider _cmd as it is used to identify the function/parser, not the
     # actual arguments
-    valid_args = set(
-        map(lambda arg_obj: arg_obj.arg, inspection.arguments.values())
-    )
+    valid_args = set(map(lambda arg_obj: arg_obj.arg, inspection.arguments.values()))
     # use the reverse map to convert the names used in parsing to the actual
     # arguments used in the command function
     # filter out any argument that is not accepted by this function.

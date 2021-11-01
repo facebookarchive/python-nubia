@@ -9,10 +9,10 @@
 
 import sys
 
-import example.commands
-from nubia import Nubia, Options
 from nubia_plugin import NubiaExamplePlugin
 
+import example.commands
+from nubia import Nubia, Options
 
 if __name__ == "__main__":
     plugin = NubiaExamplePlugin()

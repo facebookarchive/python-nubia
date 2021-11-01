@@ -9,10 +9,9 @@
 
 import sys
 
-from nubia import PluginInterface
+from nubia import Nubia, PluginInterface
 from nubia.internal.blackcmd import CommandBlacklist
 from nubia.internal.cmdbase import AutoCommand
-from nubia import Nubia
 
 
 class TestPlugin(PluginInterface):

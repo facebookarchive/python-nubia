@@ -47,7 +47,7 @@ class SessionLogger:
             self._log_file.flush()
 
     def _strip_ansii_colors(self, text):
-        return re.sub('\x1b\\[.+?m', '', text)
+        return re.sub("\x1b\\[.+?m", "", text)
 
     def isatty(self):
         return self.original_stdout.isatty()

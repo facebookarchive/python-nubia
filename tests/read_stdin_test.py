@@ -10,8 +10,10 @@ import os
 import sys
 import tempfile
 import unittest
+
 from nubia import argument, command
 from tests.util import TestShell
+
 
 class ReadStdinTest(unittest.TestCase):
     def test_read_from_stdin(self):
@@ -25,9 +27,7 @@ class ReadStdinTest(unittest.TestCase):
             return 22
 
         command_file = tempfile.NamedTemporaryFile(
-            mode="w+",
-            prefix="test_read_from_stdin",
-            delete=True
+            mode="w+", prefix="test_read_from_stdin", delete=True
         )
         command_file.write("test-command arg=test_arg")
         command_file.flush()

@@ -7,12 +7,11 @@
 # LICENSE file in the root directory of this source tree.
 #
 
+from prompt_toolkit.completion import WordCompleter
+from termcolor import cprint
+
 from nubia.internal.cmdbase import Command
 from nubia.internal.io.eventbus import Listener
-
-from prompt_toolkit.completion import WordCompleter
-
-from termcolor import cprint
 
 
 class CommandsRegistry:
@@ -59,9 +58,7 @@ class CommandsRegistry:
         cmd_instance.add_arguments(self._parser)
 
         if not override:
-            conflicts = [
-                cmd for cmd in cmd_keys if cmd in self._cmd_instance_map
-            ]
+            conflicts = [cmd for cmd in cmd_keys if cmd in self._cmd_instance_map]
             if conflicts:
                 raise ValueError(
                     "Some other command instance has registered "
