@@ -70,42 +70,38 @@ def lookup(hosts: typing.List[str], bad_name: int) -> int:
 
 ## Requirements
 
-Nubia-based applications require python 3.7+ and works with both Mac OS X or Linux. While in theory it should work on Windows, it has never been tried.
+Nubia-based applications require Python 3.7+ and works with both Mac OS X or Linux. While in theory it should work on Windows, it has never been tried.
 
 ## Installing Nubia
 
 If you are installing nubia for your next project, you should be able to easily use pip for that:
 ```bash
-pip3 install python-nubia
+pip install python-nubia
 ```
 
 ## Building Nubia from source
 
-You can either setup.py to build a tarball, or use pipenv to setup a virtualenv with all the dependencies installed.
+```bash
+poetry build
+```
 
 ## Running example in virtualenv:
 
-It's often best to create a virtualenv to contain the dependencies required for python-nubia project.
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-```
+_We recommend setting up a separate Python environment using a tool like virtualenv, pyenv-virtualenv, or `poetry shell`._
 
-If you would like to run the example, then you need to add the root of the source tree into your PYTHONPATH.
-```bash
-virtualenv .venv
-source .venv/bin/activate
 
-export PYTHONPATH="$(pwd)"
-python3 example/nubia_example.py
+If you would like to run the example, install the dependencies and run the example module as a script.
+
+```bash
+poetry install
+cd example
+python -m nubia_example
 ```
 
 To run the unit tests:
 
-From within the virtualenv you can use nosetests:
 ```bash
-nosetests
+poetry run nosetests
 ```
 
 ## Getting Started
