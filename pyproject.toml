@@ -28,7 +28,7 @@ exclude = '''
 
 [tool.poetry]
 name = "python-nubia"
-version = "0.2b5"
+version = "0.3.0"
 description = "A framework for building beautiful shells."
 authors = ["Ahmed Soliman <asoli@fb.com>", "Andreas Backx <andreasbackx@fb.com>"]
 license = "BSD"
