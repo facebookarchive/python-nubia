@@ -7,6 +7,7 @@
 # LICENSE file in the root directory of this source tree.
 #
 
+
 import logging
 import os
 from typing import Any, List, Tuple
@@ -20,9 +21,10 @@ from prompt_toolkit.formatted_text import PygmentsTokens
 from prompt_toolkit.history import FileHistory, InMemoryHistory
 from prompt_toolkit.layout.processors import HighlightMatchingBracketProcessor
 from prompt_toolkit.lexers import PygmentsLexer
+from prompt_toolkit.patch_stdout import patch_stdout
 from termcolor import cprint
 
-from nubia.internal.helpers import catchall, find_approx, suggestions_msg
+from nubia.internal.helpers import catchall, find_approx, suggestions_msg, try_await
 from nubia.internal.io.eventbus import Listener
 from nubia.internal.options import Options
 from nubia.internal.ui.lexer import NubiaLexer
@@ -81,14 +83,14 @@ class IOLoop(Listener):
     def _get_bottom_toolbar(self) -> List[Tuple[Any, str]]:
         return PygmentsTokens(self._status_bar.get_tokens())
 
-    def parse_and_evaluate(self, input):
+    async def parse_and_evaluate(self, input):
         command_parts = split_command(input)
         if command_parts and command_parts[0]:
             cmd = command_parts[0]
             args = command_parts[1] if len(command_parts) > 1 else None
-            return self.evaluate_command(cmd, args, input)
+            return await self.evaluate_command(cmd, args, input)
 
-    def evaluate_command(self, cmd, args, raw):
+    async def evaluate_command(self, cmd, args, raw):
         args = args or ""
 
         if cmd in self._command_registry:
@@ -130,7 +132,7 @@ class IOLoop(Listener):
                 logging.error(err_message)
             try:
                 catchall(self._usagelogger.pre_exec)
-                result = cmd_instance.run_interactive(cmd, args, raw)
+                result = await try_await(cmd_instance.run_interactive(cmd, args, raw))
                 catchall(self._usagelogger.post_exec, cmd, args, result, False)
                 self._status_bar.set_last_command_status(result)
                 return result
@@ -139,25 +141,28 @@ class IOLoop(Listener):
                 # not implemented error code
                 return 99
 
-    def run(self):
+    async def run(self):
         prompt = self._build_cli()
         self._status_bar.start()
         try:
             while True:
                 try:
-                    text = prompt.prompt(
-                        PygmentsTokens(self._get_prompt_tokens()),
-                        rprompt=PygmentsTokens(self._status_bar.get_rprompt_tokens()),
-                    )
+                    with patch_stdout():
+                        text = await prompt.prompt_async(
+                            PygmentsTokens(self._get_prompt_tokens()),
+                            rprompt=PygmentsTokens(
+                                self._status_bar.get_rprompt_tokens()
+                            ),
+                        )
                     session_logger = self._plugin.get_session_logger(self._ctx)
                     if session_logger:
                         # Commands don't get written to stdout, so we have to
                         # explicitly dump them to the session log.
                         session_logger.log_command(text)
                         with session_logger.patch():
-                            self.parse_and_evaluate(text)
+                            await self.parse_and_evaluate(text)
                     else:
-                        self.parse_and_evaluate(text)
+                        await self.parse_and_evaluate(text)
                 except KeyboardInterrupt:
                     pass
         except EOFError:
@@ -165,7 +170,7 @@ class IOLoop(Listener):
             pass
         self._status_bar.stop()
 
-    def on_connected(self, *args, **kwargs):
+    async def on_connected(self, *args, **kwargs):
         pass
 
 

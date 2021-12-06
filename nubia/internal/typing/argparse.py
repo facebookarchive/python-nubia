@@ -15,8 +15,9 @@ import subprocess
 import sys
 from collections import defaultdict
 from functools import partial
-from typing import Any, Dict, List, Tuple  # noqa F401
+from typing import Any, Dict, List, Tuple
 
+from nubia.internal.helpers import try_await  # noqa F401
 from nubia.internal.typing.builder import (
     build_value,
     get_dict_kv_arg_type_as_str,

@@ -16,3 +16,11 @@ def example_command1():
     An example command for testing purposes
     """
     return None
+
+
+@command
+async def example_async_command1():
+    """
+    An example command for testing purposes async
+    """
+    return None

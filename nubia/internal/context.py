@@ -12,11 +12,10 @@ import getpass
 import os
 import sys
 from threading import RLock
-from typing import Any, List, Tuple
-
-from pygments.token import Token
+from typing import List, Tuple, Any
 
 from nubia.internal.io.eventbus import Listener
+from pygments.token import Token
 
 
 class Context(Listener):
@@ -89,21 +88,21 @@ class Context(Listener):
         ]
         return tokens
 
-    def on_connected(self, *args, **kwargs):
+    async def on_connected(self, *args, **kwargs):
         """
         A callback that gets called when the shell is started cli-mode,
         the args argument contains the ArgumentParser result.
         """
         pass
 
-    def on_interactive(self, args):
+    async def on_interactive(self, args):
         """
         A callback that gets called when the shell is started interactive-mode,
         the args argument contains the ArgumentParser result.
         """
         pass
 
-    def on_cli(self, cmd, args):
+    async def on_cli(self, cmd, args):
         """
         A callback that gets called when the shell is started cli-mode,
         the args argument contains the ArgumentParser result.

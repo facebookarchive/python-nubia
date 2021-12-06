@@ -9,15 +9,11 @@
 
 import ast
 import re
-import sys
-# To use a consistent encoding
-from codecs import open
 from os import path
+from pathlib import Path
 
+# To use a consistent encoding
 import setuptools
-
-assert sys.version_info >= (3, 7, 0), "python-nubia requires Python 3.7+"
-from pathlib import Path  # noqa E402
 
 here = Path(__file__).parent
 
@@ -54,7 +50,7 @@ setuptools.setup(
     packages=setuptools.find_packages(exclude=["sample", "docs", "tests"]),
     python_requires=">=3.7",
     setup_requires=["nose>=1.0", "coverage"],
-    tests_require=["nose>=1.0"],
+    tests_require=["nose>=1.0", "later>=20.10"],
     entry_points={"console_scripts": ["_nubia_complete = nubia_complete.main:main"]},
     install_requires=reqs,
     classifiers=(

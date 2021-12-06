@@ -15,7 +15,7 @@ class StatusBar(eventbus.Listener):
     def __init__(self, context):
         pass
 
-    def on_connected(self, *args, **kwargs):
+    async def on_connected(self, *args, **kwargs):
         """
         Do nothing by default.
         """

@@ -24,14 +24,14 @@ class Connect(Command):
         super(Connect, self).__init__()
         self._built_in = True
 
-    def run_interactive(self, cmd, args, raw):
-        return self._run()
+    async def run_interactive(self, cmd, args, raw):
+        return await self._run()
 
-    def run_cli(self, args):
-        return self._run()
+    async def run_cli(self, args):
+        return await self._run()
 
-    def _run(self):
-        self._command_registry.dispatch_message(Message.CONNECTED)
+    async def _run(self):
+        await self._command_registry.dispatch_message(Message.CONNECTED)
         return 0
 
     def get_command_names(self):

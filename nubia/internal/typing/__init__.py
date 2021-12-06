@@ -65,9 +65,14 @@ from collections.abc import Container
 from functools import partial
 from inspect import isclass, ismethod
 
-from nubia.internal.helpers import (function_to_str, get_arg_spec,
-                                    transform_class_name, transform_name)
 from termcolor import cprint
+
+from nubia.internal.helpers import (
+    function_to_str,
+    get_arg_spec,
+    transform_class_name,
+    transform_name,
+)
 
 Argument = namedtuple(
     "Argument",
@@ -78,9 +83,7 @@ Argument = namedtuple(
 
 Command = namedtuple("Command", "name help aliases exclusive_arguments")
 
-FunctionInspection = namedtuple(
-    "FunctionInspection", "arguments " "command subcommands"
-)
+FunctionInspection = namedtuple("FunctionInspection", "arguments command subcommands")
 _ArgDecoratorSpec = namedtuple(
     "_ArgDecoratorSpec", "arg name aliases description positional choices"
 )

@@ -11,6 +11,7 @@ import sys
 
 from traitlets.config.loader import Config
 
+from nubia.internal.helpers import try_await
 from nubia.internal.ui.ipython import NubiaPrompt
 
 try:
@@ -22,8 +23,8 @@ except ImportError:
 custom_locals = {}
 
 
-def start_interactive_python(plugin, registry, ctx, args):
-    ctx.on_interactive(args)
+async def start_interactive_python(plugin, registry, ctx, args):
+    await try_await(ctx.on_interactive(args))
     cmds = list(registry.get_all_commands())
     for cmd in cmds:
         # TODO: This currently works for AutoCommands only, it's a hack to get

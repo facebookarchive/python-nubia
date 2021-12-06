@@ -23,7 +23,12 @@ from termcolor import cprint
 from nubia.internal import parser
 from nubia.internal.completion import AutoCommandCompletion
 from nubia.internal.exceptions import CommandParseError
-from nubia.internal.helpers import find_approx, function_to_str, suggestions_msg
+from nubia.internal.helpers import (
+    find_approx,
+    function_to_str,
+    suggestions_msg,
+    try_await,
+)
 from nubia.internal.options import Options
 from nubia.internal.typing import FunctionInspection, inspect_object
 from nubia.internal.typing.argparse import (
@@ -54,21 +59,21 @@ class Command:
     def set_command_registry(self, command_registry):
         self._command_registry = command_registry
 
-    def run_interactive(self, cmd, args, raw):
+    async def run_interactive(self, cmd, args, raw):
         """
         This function MUST be overridden by all commands. It will be called when
         the command is executed in interactive mode.
         """
         raise NotImplementedError("run_interactive must be overridden")
 
-    def run_cli(self, args):
+    async def run_cli(self, args):
         """
         This function SHOULD be implemented in order to expose a subcommand in
         the CLI interface. It will be called when run from the CLI.
         """
         pass
 
-    def add_arguments(self, parser):
+    async def add_arguments(self, parser):
         """
         This function receives an instance of an "argparse.ArgumentParser".
         Every command SHOULD use it to tell the CLI interface which options
@@ -206,7 +211,7 @@ class AutoCommand(Command):
         }
         return self._fn(**kwargs), remaining
 
-    def run_interactive(self, cmd, args, raw):
+    async def run_interactive(self, cmd, args, raw):
         try:
             args_metadata = self.metadata.arguments
             parsed = parser.parse(args, expect_subcommand=self.super_command)
@@ -332,7 +337,7 @@ class AutoCommand(Command):
             extra_keys = set(args_dict.keys()) - set(args_metadata)
             if extra_keys:
                 cprint(
-                    "Unknown argument(s) {} were" " passed".format(list(extra_keys)),
+                    f"Unknown argument(s) {sorted(extra_keys)} were passed",
                     "magenta",
                 )
                 return 2
@@ -402,11 +407,8 @@ class AutoCommand(Command):
             try:
                 # convert argument names back to match the function signature
                 args_dict = {args_metadata[k].arg: v for k, v in args_dict.items()}
-                if inspect.iscoroutinefunction(fn):
-                    loop = asyncio.get_event_loop()
-                    ret = loop.run_until_complete(fn(**args_dict))
-                else:
-                    ret = fn(**args_dict)
+
+                ret = await try_await(fn(**args_dict))
                 ctx.set_verbose(old_verbose)
             except Exception as e:
                 cprint("Error running command: {}".format(str(e)), "red")
@@ -458,7 +460,7 @@ class AutoCommand(Command):
             if v is not None
         }
 
-    def run_cli(self, args):
+    async def run_cli(self, args):
         # if this is a super-command, we need to dispatch the call to the
         # correct function
         kwargs = self._kwargs_for_fn(self._fn, args)
@@ -475,12 +477,10 @@ class AutoCommand(Command):
                 kwargs = self._kwargs_for_fn(fn, args)
             else:
                 fn = self._fn
-            if inspect.iscoroutinefunction(fn):
-                # execute in an event loop
-                loop = asyncio.get_event_loop()
-                return loop.run_until_complete(fn(**kwargs))
-            else:
-                return fn(**kwargs)
+
+            ret = await try_await(fn(**kwargs))
+
+            return ret
         except Exception as e:
             cprint("Error running command: {}".format(str(e)), "red")
             cprint("-" * 60, "yellow")
@@ -496,7 +496,7 @@ class AutoCommand(Command):
         assert self.super_command
         return subcommand.lower() in self._subcommand_names
 
-    def add_arguments(self, parser):
+    async def add_arguments(self, parser):
         register_command(parser, self.metadata)
 
     def get_command_names(self):

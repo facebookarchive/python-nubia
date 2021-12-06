@@ -8,6 +8,7 @@
 #
 
 import argparse
+import asyncio
 import codecs
 import locale
 import logging
@@ -17,13 +18,11 @@ import tempfile
 import traceback
 import typing
 
-from termcolor import cprint
-
 from nubia.internal import cmdloader, context, exceptions
 from nubia.internal.blackcmd import CommandBlacklist
 from nubia.internal.cmdbase import AutoCommand
 from nubia.internal.commands import builtin, help
-from nubia.internal.helpers import catchall
+from nubia.internal.helpers import catchall, try_await
 from nubia.internal.interactive import IOLoop
 from nubia.internal.io import logger
 from nubia.internal.options import Options
@@ -31,6 +30,7 @@ from nubia.internal.plugin_interface import PluginInterface
 from nubia.internal.registry import CommandsRegistry
 from nubia.internal.typing.argparse import create_subparser_class
 from nubia.internal.usage_logger_interface import UsageLoggerInterface
+from termcolor import cprint
 
 
 def set_default_subparser(self, name, args=None):
@@ -102,50 +102,6 @@ class Nubia:
         # Load, setup the usagelogger
         self._usagelogger = None
 
-        self._opts_parser = self._plugin.get_opts_parser()
-        SubParser = create_subparser_class(self._opts_parser)
-        self._opts_parser.add_argument(
-            "--_print-completion-model", action="store_true", help=argparse.SUPPRESS
-        )
-
-        cmd_parser = self._opts_parser.add_subparsers(
-            dest="_cmd",
-            help="Subcommand to run, if missing the interactive mode is started"
-            " instead.",
-            parser_class=SubParser,
-            metavar="[command]",
-        )
-
-        builtin_cmds = [
-            builtin.Connect,
-            builtin.Exit,
-            builtin.Verbose,
-            help.HelpCommand,
-        ]
-
-        listeners = self._plugin.get_listeners()
-        self._registry = CommandsRegistry(cmd_parser, listeners)
-        self._ctx.set_registry(self._registry)
-        self._registry.register_priority_listener(self._ctx)
-        # register built-in commands
-        for cmd in builtin_cmds:
-            self._registry.register_command(cmd())
-
-        # load commands from plugin
-        for cmd in self._plugin.get_commands():
-            self._registry.register_command(cmd, override=True)
-        # load commands from command packages
-        if not isinstance(self._command_pkgs, list):
-            self._command_pkgs = [self._command_pkgs]
-        for pkg in self._command_pkgs:
-            for cmd in cmdloader.load_commands(pkg):
-                self._registry.register_command(
-                    AutoCommand(cmd, self._options), override=True
-                )
-        # By default, if we didn't receive any command we will use the connect
-        # command which drops us to an interactive mode.
-        self._opts_parser.set_default_subparser("connect")
-
     def _setup_logging(self, args):
         root_logger = self._plugin.setup_logging(logging.root, args)
         if root_logger:
@@ -170,10 +126,12 @@ class Nubia:
 
         logger.setup_logger(level=logging_level, stream=logging_stream)
 
-    def start_ipython(self, args):
+    async def start_ipython(self, args):
         from nubia.internal.ipython import start_interactive_python
 
-        return start_interactive_python(self._plugin, self._registry, self._ctx, args)
+        return await start_interactive_python(
+            self._plugin, self._registry, self._ctx, args
+        )
 
     @property
     def usage_logger(self):
@@ -196,18 +154,18 @@ class Nubia:
         if getattr(args, "no_color", False) or not sys.stdout.isatty():
             os.environ["ANSI_COLORS_DISABLED"] = "True"
 
-    def _create_interactive_io_loop(self, args):
+    async def _create_interactive_io_loop(self, args):
         io_loop = IOLoop(self._ctx, self._plugin, self.usage_logger, self._options)
-        self._ctx.on_interactive(args)
+        await try_await(self._ctx.on_interactive(args))
         return io_loop
 
-    def start_interactive(self, args):
-        io_loop = self._create_interactive_io_loop(args)
+    async def start_interactive(self, args):
+        io_loop = await self._create_interactive_io_loop(args)
         ret = 0
         # Only run the Interactive mode if std is a tty, otherwise
         # we should rad the input from stdin, process it, and exit.
         if sys.stdin.isatty():
-            io_loop.run()
+            await io_loop.run()
             return ret
         else:
             # Read the command from stdin and run
@@ -215,7 +173,7 @@ class Nubia:
             for command in commands:
                 # execute
                 print("> {}".format(command))
-                ret = io_loop.parse_and_evaluate(command)
+                ret = await io_loop.parse_and_evaluate(command)
                 # We fail execution on the first failing command
                 if ret:
                     return ret
@@ -251,7 +209,7 @@ class Nubia:
             )
             return 1
 
-    def run_cli(self, args):
+    async def run_cli(self, args):
         catchall(self.usage_logger.pre_exec)
         try:
             ret = self._blacklist.is_blacklisted(args._cmd)
@@ -265,11 +223,56 @@ class Nubia:
             )
             cprint(err_message, "red")
             logging.error(err_message)
-        self._ctx.on_cli(args._cmd, args)
-        ret = self._registry.find_command(args._cmd).run_cli(args)
+        await try_await(self._ctx.on_cli(args._cmd, args))
+        ret = await try_await(self._registry.find_command(args._cmd).run_cli(args))
         return ret
 
-    def _pre_run(self, cli_args):
+    async def _pre_run(self, cli_args):
+        self._opts_parser = self._plugin.get_opts_parser()
+        SubParser = create_subparser_class(self._opts_parser)
+        self._opts_parser.add_argument(
+            "--_print-completion-model", action="store_true", help=argparse.SUPPRESS
+        )
+
+        cmd_parser = self._opts_parser.add_subparsers(
+            dest="_cmd",
+            help="Subcommand to run, if missing the interactive mode is started"
+            " instead.",
+            parser_class=SubParser,
+            metavar="[command]",
+        )
+
+        builtin_cmds = [
+            builtin.Connect,
+            builtin.Exit,
+            builtin.Verbose,
+            help.HelpCommand,
+        ]
+
+        listeners = self._plugin.get_listeners()
+        self._registry = CommandsRegistry(cmd_parser, listeners)
+        self._ctx.set_registry(self._registry)
+        self._registry.register_priority_listener(self._ctx)
+        # register built-in commands
+        for cmd in builtin_cmds:
+            await self._registry.register_command(cmd())
+
+        # load commands from plugin
+        for cmd in self._plugin.get_commands():
+            await self._registry.register_command(cmd, override=True)
+        # load commands from command packages
+        if not isinstance(self._command_pkgs, list):
+            self._command_pkgs = [self._command_pkgs]
+        for pkg in self._command_pkgs:
+            for cmd in cmdloader.load_commands(pkg):
+                await self._registry.register_command(
+                    AutoCommand(cmd, self._options), override=True
+                )
+
+        # By default, if we didn't receive any command we will use the connect
+        # command which drops us to an interactive mode.
+        self._opts_parser.set_default_subparser("connect")
+
         args = self._parse_args(cli_args)
         self._setup_logging(args)
         # check if we can add colors to stdout
@@ -282,13 +285,20 @@ class Nubia:
         return args
 
     def run(self, cli_args=sys.argv, ipython=False):
+        if sys.version_info[0] == 3 and sys.version_info[1] >= 7:
+            return asyncio.run(self.run_async(cli_args, ipython))
+
+        loop = asyncio.get_event_loop()
+        return loop.run_until_complete(self.run_async(cli_args, ipython))
+
+    async def run_async(self, cli_args=sys.argv, ipython=False):
         """
         Runs nubia either in interactive or cli (or parsing commands from
         stdin) based on the cli_args supplied (defaults to sys.argv). This will
         block until the shell is done processing all the input and will return
         the exit code.
         """
-        args = self._pre_run(cli_args)
+        args = await self._pre_run(cli_args)
 
         if args._print_completion_model:
             from nubia.internal import registry_tools as regtools
@@ -304,12 +314,12 @@ class Nubia:
                 traceback.print_exc()
                 return 1
         if ipython:
-            return self.start_ipython(args)
+            return await self.start_ipython(args)
         # by default, if no command is passed we will get 'connect'
         if args._cmd == "connect":
-            return self.start_interactive(args)
+            return await self.start_interactive(args)
         else:
-            ret = self.run_cli(args)
+            ret = await self.run_cli(args)
             catchall(self.usage_logger.post_exec, args._cmd, cli_args, ret, True)
 
         if type(ret) is int:

@@ -10,6 +10,8 @@
 import logging
 import traceback
 
+from nubia.internal.helpers import try_await
+
 logger = logging.getLogger(__name__)
 
 
@@ -18,15 +20,15 @@ class Message:
 
 
 class Listener:
-    def react(self, msg, *args, **kwargs):
+    async def react(self, msg, *args, **kwargs):
         if msg == Message.CONNECTED:
             try:
-                self.on_connected(*args, **kwargs)
+                await try_await(self.on_connected(*args, **kwargs))
             except NotImplementedError:
                 raise
             except Exception as e:
-                logger.info("Couldn't initialize {}: {}".format(type(self), e))
+                logger.info("Couldn't initialize {}: " "{}".format(type(self), e))
                 traceback.print_exc()
 
-    def on_connected(*args, **kwargs):
+    async def on_connected(*args, **kwargs):
         raise NotImplementedError("Listeners must implement on_connected method")
