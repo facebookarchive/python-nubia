@@ -25,3 +25,34 @@ exclude = '''
   | dist
 )/
 '''
+
+[tool.poetry]
+name = "python-nubia"
+version = "0.2b5"
+description = "A framework for building beautiful shells."
+authors = ["Ahmed Soliman <asoli@fb.com>", "Andreas Backx <andreasbackx@fb.com>"]
+license = "BSD"
+packages = [
+  { include = "nubia" }
+]
+include = ["LICENSE"]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+jellyfish = "^0.8.9"
+prettytable = "^2.4.0"
+prompt-toolkit = "^3.0.23"
+Pygments = "^2.10.0"
+pyparsing = "^2.4.7"
+termcolor = "^1.1.0"
+typing-inspect = "^0.7.1"
+wcwidth = "^0.2.5"
+
+[tool.poetry.dev-dependencies]
+codecov = "^2.1.12"
+nose = "^1.3.7"
+pre-commit = "^2.16.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

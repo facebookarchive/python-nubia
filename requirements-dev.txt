@@ -1,5 +1,0 @@
--r requirements.txt
-codecov
-nose
-pre-commit
-later
