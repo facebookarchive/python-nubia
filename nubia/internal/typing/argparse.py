@@ -167,8 +167,7 @@ def _resolve_subparsers(parser):
     return subparsers
 
 
-def _argument_to_argparse_input(arg):
-    # type: (Any) -> Tuple[List, Dict[str, Any]]
+def _argument_to_argparse_input(arg: "Any") -> "Tuple[List, Dict[str, Any]]":
 
     add_argument_kwargs = {"help": arg.description}
     if arg.positional:
