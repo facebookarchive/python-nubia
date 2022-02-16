@@ -430,7 +430,7 @@ class CommandSpecTest(TestCase):
             """
             Sample Docstring
             """
-            self.assertEquals(type(5), type(arg1))
+            self.assertEqual(type(5), type(arg1))
             return 42 if arg1 == -1 else -1
 
         shell = TestShell(commands=[test_command])
@@ -448,7 +448,7 @@ class CommandSpecTest(TestCase):
             """
             Sample Docstring
             """
-            self.assertEquals(type(5.0), type(arg1))
+            self.assertEqual(type(5.0), type(arg1))
             return 42 if arg1 == -1.0 else 55
 
         shell = TestShell(commands=[test_command])

@@ -15,14 +15,14 @@ from tests import empty_package, sample_package
 
 class CommandLoaderTest(unittest.TestCase):
     def test_load_no_packages(self):
-        self.assertEquals([], list(cmdloader.load_commands(None)))
+        self.assertEqual([], list(cmdloader.load_commands(None)))
 
     def test_load_empty_packages(self):
-        self.assertEquals([], list(cmdloader.load_commands(empty_package)))
+        self.assertEqual([], list(cmdloader.load_commands(empty_package)))
 
     def test_load_sample_packages(self):
         loaded = list(cmdloader.load_commands(sample_package))
-        self.assertEquals(4, len(loaded))
+        self.assertEqual(4, len(loaded))
         from tests.sample_package import commands
         from tests.sample_package.subpackage import more_commands
 
