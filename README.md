@@ -1,6 +1,6 @@
 # python-nubia
 
-[![Support Ukraine](https://img.shields.io/badge/Support-Ukraine-FFD500?style=flat&labelColor=005BBB)](https://opensource.fb.com/support-ukraine) 
+[![Support Ukraine](https://img.shields.io/badge/Support-Ukraine-FFD500?style=flat&labelColor=005BBB)](https://opensource.fb.com/support-ukraine)
 ![Nubia Build](https://github.com/facebookincubator/python-nubia/workflows/Nubia%20Build/badge.svg)
 [![Coverage](https://codecov.io/gh/facebookincubator/python-nubia/branch/main/graph/badge.svg)](https://codecov.io/github/facebookincubator/python-nubia)
 [![PyPI version](https://badge.fury.io/py/python-nubia.svg)](https://badge.fury.io/py/python-nubia)
