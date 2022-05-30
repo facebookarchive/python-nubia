@@ -1,5 +1,9 @@
 # python-nubia
 
+This project has been archived, the README below is kept for archiving purposes. See [#88](https://github.com/facebookincubator/python-nubia/issues/88) for more information.
+
+---
+
 [![Support Ukraine](https://img.shields.io/badge/Support-Ukraine-FFD500?style=flat&labelColor=005BBB)](https://opensource.fb.com/support-ukraine)
 ![Nubia Build](https://github.com/facebookincubator/python-nubia/workflows/Nubia%20Build/badge.svg)
 [![Coverage](https://codecov.io/gh/facebookincubator/python-nubia/branch/main/graph/badge.svg)](https://codecov.io/github/facebookincubator/python-nubia)
